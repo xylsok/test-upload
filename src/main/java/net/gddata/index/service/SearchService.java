@@ -37,7 +37,7 @@ public class SearchService {
             return "有一个正在执行的任务，请等待";
         }
         createIndexState = true;
-
+        kwordDao.updateKeword();
         //索引
         List<SubIndex> indexes = indexUtils.getIndexs();
         if (indexes.size() == 0) {
@@ -63,6 +63,7 @@ public class SearchService {
             if (null != keword && null != keword.getSchKw() && !"".equals(keword.getSchKw())) {
                 Boolean status = getSearchItem(keword.getSchKw(), parser, searcher);
                 if (status) {
+                    kwordDao.updateInvalid(keword.getId());
                     break;
                 } else {
                     Integer search = getSearch(checkKeyword(keword.getSchKw()), parser, searcher);

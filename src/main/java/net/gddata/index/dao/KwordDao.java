@@ -37,4 +37,12 @@ public class KwordDao extends JooqDao<KwordRecord, Keword, Integer> {
     public void updateCount(Integer id, Integer search) {
         create().update(KWORD).set(KWORD.P, 9).set(KWORD.SCH_COUNT, search).where(KWORD.ID.eq(id)).execute();
     }
+
+    public void updateInvalid(Integer id) {
+        create().update(KWORD).set(KWORD.INVALID,1).where(KWORD.ID.eq(id)).execute();
+    }
+
+    public void updateKeword() {
+        create().update(KWORD).set(KWORD.INVALID,0).set(KWORD.SCH_COUNT,0).set(KWORD.P,0).execute();
+    }
 }

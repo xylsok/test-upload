@@ -37,7 +37,7 @@ public class SearchService {
             return "有一个正在执行的任务，请等待";
         }
         createIndexState = true;
-        kwordDao.updateKeword();
+//        kwordDao.updateKeword();
         //索引
         List<SubIndex> indexes = indexUtils.getIndexs();
         if (indexes.size() == 0) {

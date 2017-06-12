@@ -97,10 +97,8 @@ public class SearchService {
                     //searching
                     TopDocs docs = searcher.search(query, Integer.MAX_VALUE);
                     int totalHits = docs.totalHits;
-                    if (totalHits > 20000) {
+                    if (totalHits >= 20000) {
                         status = true;
-                        return status;
-                    } else {
                         return status;
                     }
                 } catch (IOException e) {

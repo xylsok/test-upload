@@ -61,30 +61,53 @@ public class SearchService {
 
         for (Keword keword : all) {
             if (null != keword && null != keword.getSchKw() && !"".equals(keword.getSchKw())) {
-                String[] split = keword.getSchKw().split(";");
-                for (String s : split) {
-                    System.out.println(s);
-                    Query query = getDissClause("complex", s.trim(), parser);
-                    if (null != query) {
-                        //search
-                        try {
-                            //searching
-                            TopDocs docs = searcher.search(query, Integer.MAX_VALUE);
-                            int totalHits = docs.totalHits;
-                            if (totalHits > 10) {
-                                break;
-                            } else {
-                                getSearch(keword.getCnKw(), parser, searcher);
-                            }
-                            System.out.println("数量：" + totalHits);
+                Boolean status = getSearchItem(keword.getSchKw(), parser, searcher);
+                if (status) {
+                    break;
+                } else {
+                    Integer search = getSearch(checkKeyword(keword.getSchKw()), parser, searcher);
+                    kwordDao.updateCount(keword.getId(), search);
+                }
+            }
+            if (keword.getId() % 1000 == 0) {
+                System.out.println(keword.getId() + "===" + keword.getCnKw());
+            }
+        }
+        System.out.println("success");
+    }
 
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+    public String checkKeyword(String keyword) {
+        StringBuffer stringBuffer = new StringBuffer();
+        String[] split = keyword.split(";");
+        for (String s : split) {
+            stringBuffer.append("\"" + s.trim() + "\"" + " ");
+        }
+        return stringBuffer.toString();
+    }
+
+    public Boolean getSearchItem(String keyword, QueryParser parser, IndexSearcher searcher) {
+        Boolean status = false;
+        String[] split = keyword.split(";");
+        for (String s : split) {
+            Query query = getDissClause("complex", s.trim(), parser);
+            if (null != query) {
+                //search
+                try {
+                    //searching
+                    TopDocs docs = searcher.search(query, Integer.MAX_VALUE);
+                    int totalHits = docs.totalHits;
+                    if (totalHits > 20000) {
+                        status = true;
+                        return status;
+                    } else {
+                        return status;
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
+        return status;
     }
 
     public Integer getSearch(String keyword, QueryParser parser, IndexSearcher searcher) {

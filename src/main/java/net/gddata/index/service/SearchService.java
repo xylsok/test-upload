@@ -66,7 +66,7 @@ public class SearchService {
                     kwordDao.updateInvalid(keword.getId());
                 } else {
                     String keyword = checkKeyword(keword.getSchKw());
-                    keyword = keyword.replace("\"\"","");
+                    keyword = keyword.replace("\"\"", "");
                     Integer count = getSearch(keyword, parser, searcher);
                     kwordDao.updateCount(keword.getId(), count);
                 }
@@ -201,5 +201,23 @@ public class SearchService {
                 break;
         }
         return occur;
+    }
+
+    public Integer getRetrieve(String keyword) {
+        //索引
+        List<SubIndex> indexes = indexUtils.getIndexs();
+        if (indexes.size() == 0) {
+            System.out.println("没有可用的索引");
+            return null;
+        }
+        IndexSearcher searcher = getSearchers(indexes);
+        if (null != searcher) {
+            Analyzer analyzer = new StandardAnalyzer();
+            String defaultField = "title";
+            QueryParser parser = new QueryParser(defaultField, analyzer);
+            Integer count = getSearch(keyword, parser, searcher);
+            return count;
+        }
+        return null;
     }
 }

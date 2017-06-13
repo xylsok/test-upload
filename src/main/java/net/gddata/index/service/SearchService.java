@@ -37,7 +37,6 @@ public class SearchService {
             return "有一个正在执行的任务，请等待";
         }
         createIndexState = true;
-//        kwordDao.updateKeword();
         //索引
         List<SubIndex> indexes = indexUtils.getIndexs();
         if (indexes.size() == 0) {
@@ -70,8 +69,8 @@ public class SearchService {
                     kwordDao.updateCount(keword.getId(), search);
                 }
             }
-            if (keword.getId() % 1000 == 0) {
-                System.out.println(keword.getId() + "===" + keword.getCnKw());
+            if (keword.getId() % 100 == 0) {
+                System.out.println(keword.getId() + "===" + keword.getSchKw());
             }
         }
         System.out.println("success");
@@ -90,13 +89,20 @@ public class SearchService {
         Boolean status = false;
         String[] split = keyword.split(";");
         for (String s : split) {
-            Query query = getDissClause("complex", s.trim(), parser);
-            if (null != query) {
+            BooleanClause complex = getDissClause("complex", s.trim(), parser);
+            List<BooleanClause> clauseList = new ArrayList<>();
+            if (null != complex) {
                 //search
+                clauseList.clear();
+                clauseList.add(complex);
+                BooleanQuery.Builder builder = new BooleanQuery.Builder();
+                clauseList.forEach(builder::add);
+                BooleanQuery bq = builder.build();
                 try {
                     //searching
-                    TopDocs docs = searcher.search(query, Integer.MAX_VALUE);
+                    TopDocs docs = searcher.search(bq, Integer.MAX_VALUE);
                     int totalHits = docs.totalHits;
+//                    System.out.println(totalHits);
                     if (totalHits >= 20000) {
                         status = true;
                         return status;
@@ -110,12 +116,18 @@ public class SearchService {
     }
 
     public Integer getSearch(String keyword, QueryParser parser, IndexSearcher searcher) {
-        Query query = getDissClause("complex", keyword.trim(), parser);
-        if (null != query) {
+        BooleanClause complex = getDissClause("complex", keyword.trim(), parser);
+        List<BooleanClause> clauseList = new ArrayList<>();
+        if (null != complex) {
+            clauseList.clear();
+            clauseList.add(complex);
+            BooleanQuery.Builder builder = new BooleanQuery.Builder();
+            clauseList.forEach(builder::add);
+            BooleanQuery bq = builder.build();
             //search
             try {
                 //searching
-                TopDocs docs = searcher.search(query, Integer.MAX_VALUE);
+                TopDocs docs = searcher.search(bq, Integer.MAX_VALUE);
                 int totalHits = docs.totalHits;
                 return totalHits;
             } catch (IOException e) {
@@ -152,7 +164,8 @@ public class SearchService {
         }
     }
 
-    private Query getDissClause(String fieldName, String keyword, QueryParser parser) {
+    private BooleanClause getDissClause(String fieldName, String keyword, QueryParser parser) {
+        BooleanClause.Occur occur = logic2ClauseOccur("and");
         try {
             Query q = null;
             switch (fieldName) {
@@ -192,7 +205,8 @@ public class SearchService {
                     break;
             }
             if (null != q) ;
-            return q;
+            BooleanClause clause = new BooleanClause(q, occur);
+            return clause;
         } catch (Exception ex) {
             return null;
         }

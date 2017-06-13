@@ -57,19 +57,21 @@ public class SearchService {
         QueryParser parser = new QueryParser(defaultField, analyzer);
 
         List<Keword> all = kwordDao.getAll();
-        System.out.println("datas:"+all.size());
+        System.out.println("datas:" + all.size());
 
         for (Keword keword : all) {
             if (null != keword && null != keword.getSchKw() && !"".equals(keword.getSchKw())) {
                 Boolean status = getSearchItem(keword.getSchKw(), parser, searcher);
                 if (status) {
-                    kwordDao.updateInvalid(keword.getId());
+//                    kwordDao.updateInvalid(keword.getId());
                 } else {
-                    Integer search = getSearch(checkKeyword(keword.getSchKw()), parser, searcher);
-                    kwordDao.updateCount(keword.getId(), search);
+                    String keyword = checkKeyword(keword.getSchKw());
+                    keyword = keyword.replace("\"\"","");
+                    Integer count = getSearch(keyword, parser, searcher);
+//                    kwordDao.updateCount(keword.getId(), count);
                 }
             }
-            if(keword.getId()%100==2){
+            if (keword.getId() % 100 == 0) {
                 System.out.println(keword.getId() + "===");
             }
 
@@ -91,19 +93,11 @@ public class SearchService {
         String[] split = keyword.split(";");
         for (String s : split) {
             Query complex = getDissClause("complex", s.trim(), parser);
-//            List<BooleanClause> clauseList = new ArrayList<>();
             if (null != complex) {
-                //search
-//                clauseList.clear();
-//                clauseList.add(complex);
-//                BooleanQuery.Builder builder = new BooleanQuery.Builder();
-//                clauseList.forEach(builder::add);
-//                BooleanQuery bq = builder.build();
                 try {
                     //searching
                     TopDocs docs = searcher.search(complex, Integer.MAX_VALUE);
                     int totalHits = docs.totalHits;
-//                    System.out.println(totalHits);
                     if (totalHits >= 20000) {
                         status = true;
                         return status;
@@ -117,7 +111,7 @@ public class SearchService {
     }
 
     public Integer getSearch(String keyword, QueryParser parser, IndexSearcher searcher) {
-        Query complex = getDissClause("complex", keyword.trim(), parser);
+        Query complex = getDissClause("complex2", keyword.trim(), parser);
 //        List<BooleanClause> clauseList = new ArrayList<>();
         if (null != complex) {
 //            clauseList.clear();
@@ -166,32 +160,9 @@ public class SearchService {
     }
 
     private Query getDissClause(String fieldName, String keyword, QueryParser parser) {
-//        BooleanClause.Occur occur = logic2ClauseOccur("and");
         try {
             Query q = null;
             switch (fieldName) {
-                case "title":
-                    q = parser.parse("title:(" + keyword + ")");
-                    break;
-                case "author":
-                    q = parser.parse("author:(" + keyword + ")");
-                    break;
-                case "subject":
-                    Query subject = parser.parse("subject:(" + keyword + ")");
-                    Query msubject = parser.parse("msubject:(" + keyword + ")");
-                    q = new BooleanQuery.Builder()
-                            .add(subject, BooleanClause.Occur.SHOULD)
-                            .add(msubject, BooleanClause.Occur.SHOULD)
-                            .build();
-                    break;
-
-                case "description":
-                    q = parser.parse("description:(" + keyword + ")");
-                    break;
-                case "fulltext":
-                    parser.setDefaultOperator(QueryParser.Operator.OR);
-                    q = parser.parse("fulltext:(" + keyword + ")");
-                    break;
                 case "complex":
                     Query q1 = parser.parse("title:(\"" + keyword + "\")");
                     Query q2 = parser.parse("description:(\"" + keyword + "\")");
@@ -203,6 +174,18 @@ public class SearchService {
                             .add(q3, BooleanClause.Occur.SHOULD)
                             .add(q4, BooleanClause.Occur.SHOULD);
                     q = builder.build();
+                    break;
+                case "complex2":
+                    Query q11 = parser.parse("title:(" + keyword + ")");
+                    Query q21 = parser.parse("description:(" + keyword + ")");
+                    Query q41 = parser.parse("msubject:(" + keyword + ")");
+                    Query q31 = parser.parse("subject:(" + keyword + ")");
+                    BooleanQuery.Builder builder2 = new BooleanQuery.Builder()
+                            .add(q11, BooleanClause.Occur.SHOULD)
+                            .add(q21, BooleanClause.Occur.SHOULD)
+                            .add(q31, BooleanClause.Occur.SHOULD)
+                            .add(q41, BooleanClause.Occur.SHOULD);
+                    q = builder2.build();
                     break;
             }
             if (null != q) ;

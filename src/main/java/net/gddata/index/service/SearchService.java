@@ -57,6 +57,7 @@ public class SearchService {
         QueryParser parser = new QueryParser(defaultField, analyzer);
 
         List<Keword> all = kwordDao.getAll();
+        System.out.println("datas:"+all.size());
 
         for (Keword keword : all) {
             if (null != keword && null != keword.getSchKw() && !"".equals(keword.getSchKw())) {

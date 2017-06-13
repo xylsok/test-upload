@@ -69,9 +69,7 @@ public class SearchService {
                     kwordDao.updateCount(keword.getId(), search);
                 }
             }
-            if (keword.getId() % 100 == 0) {
-                System.out.println(keword.getId() + "===" + keword.getSchKw());
-            }
+            System.out.println(keword.getId() + "===");
         }
         System.out.println("success");
     }

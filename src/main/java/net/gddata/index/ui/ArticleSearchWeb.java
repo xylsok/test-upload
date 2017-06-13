@@ -2,9 +2,14 @@ package net.gddata.index.ui;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import net.gddata.index.model.Keword;
 import net.gddata.index.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 /**
  * Created by zhangzf on 16/12/10.
@@ -17,16 +22,24 @@ public class ArticleSearchWeb {
     @Autowired
     SearchService searchService;
 
+    @ApiIgnore
     @ApiOperation(value = "搜索文章", notes = "高级搜索与快速搜索")
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public void retrieve() {
         searchService.searchArticls();
     }
 
-    @ApiOperation(value = "搜索文章", notes = "高级搜索与快速搜索")
+
+    @ApiOperation(value = "搜索文章数量", notes = "搜索文章数量")
     @RequestMapping(value = "/count", method = RequestMethod.GET)
     public Integer getRetrieve(@RequestParam String keyword) {
         return searchService.getRetrieve(keyword);
+    }
+
+    @ApiOperation(value = "查询列表", notes = "查询列表")
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public List<Keword> getRetrieve2(@ApiParam("条数") @RequestParam(value = "num",defaultValue = "20",required = false) Integer num ) {
+        return searchService.getRetrieve2(num);
     }
 
 }

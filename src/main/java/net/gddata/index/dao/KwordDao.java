@@ -39,10 +39,16 @@ public class KwordDao extends JooqDao<KwordRecord, Keword, Integer> {
     }
 
     public void updateInvalid(Integer id) {
-        create().update(KWORD).set(KWORD.INVALID,1).where(KWORD.ID.eq(id)).execute();
+        create().update(KWORD).set(KWORD.INVALID, 1).where(KWORD.ID.eq(id)).execute();
     }
 
     public void updateKeword() {
-        create().update(KWORD).set(KWORD.INVALID,0).set(KWORD.SCH_COUNT,0).set(KWORD.P,0).execute();
+        create().update(KWORD).set(KWORD.INVALID, 0).set(KWORD.SCH_COUNT, 0).set(KWORD.P, 0).execute();
+    }
+
+
+    public List<Keword> getKeword(Integer num) {
+        Result<KwordRecord> fetch = create().selectFrom(KWORD).limit(num).fetch();
+        return null != fetch ? fetch.into(Keword.class) : new ArrayList<>();
     }
 }

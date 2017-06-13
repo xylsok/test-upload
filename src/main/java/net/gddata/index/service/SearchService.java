@@ -63,12 +63,12 @@ public class SearchService {
             if (null != keword && null != keword.getSchKw() && !"".equals(keword.getSchKw())) {
                 Boolean status = getSearchItem(keword.getSchKw(), parser, searcher);
                 if (status) {
-//                    kwordDao.updateInvalid(keword.getId());
+                    kwordDao.updateInvalid(keword.getId());
                 } else {
                     String keyword = checkKeyword(keword.getSchKw());
                     keyword = keyword.replace("\"\"","");
                     Integer count = getSearch(keyword, parser, searcher);
-//                    kwordDao.updateCount(keword.getId(), count);
+                    kwordDao.updateCount(keword.getId(), count);
                 }
             }
             if (keword.getId() % 100 == 0) {
@@ -112,13 +112,7 @@ public class SearchService {
 
     public Integer getSearch(String keyword, QueryParser parser, IndexSearcher searcher) {
         Query complex = getDissClause("complex2", keyword.trim(), parser);
-//        List<BooleanClause> clauseList = new ArrayList<>();
         if (null != complex) {
-//            clauseList.clear();
-//            clauseList.add(complex);
-//            BooleanQuery.Builder builder = new BooleanQuery.Builder();
-//            clauseList.forEach(builder::add);
-//            BooleanQuery bq = builder.build();
             //search
             try {
                 //searching

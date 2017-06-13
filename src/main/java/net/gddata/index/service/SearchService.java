@@ -64,13 +64,15 @@ public class SearchService {
                 Boolean status = getSearchItem(keword.getSchKw(), parser, searcher);
                 if (status) {
                     kwordDao.updateInvalid(keword.getId());
-                    break;
                 } else {
                     Integer search = getSearch(checkKeyword(keword.getSchKw()), parser, searcher);
                     kwordDao.updateCount(keword.getId(), search);
                 }
             }
-            System.out.println(keword.getId() + "===");
+            if(keword.getId()%100==2){
+                System.out.println(keword.getId() + "===");
+            }
+
         }
         System.out.println("success");
     }
@@ -88,18 +90,18 @@ public class SearchService {
         Boolean status = false;
         String[] split = keyword.split(";");
         for (String s : split) {
-            BooleanClause complex = getDissClause("complex", s.trim(), parser);
-            List<BooleanClause> clauseList = new ArrayList<>();
+            Query complex = getDissClause("complex", s.trim(), parser);
+//            List<BooleanClause> clauseList = new ArrayList<>();
             if (null != complex) {
                 //search
-                clauseList.clear();
-                clauseList.add(complex);
-                BooleanQuery.Builder builder = new BooleanQuery.Builder();
-                clauseList.forEach(builder::add);
-                BooleanQuery bq = builder.build();
+//                clauseList.clear();
+//                clauseList.add(complex);
+//                BooleanQuery.Builder builder = new BooleanQuery.Builder();
+//                clauseList.forEach(builder::add);
+//                BooleanQuery bq = builder.build();
                 try {
                     //searching
-                    TopDocs docs = searcher.search(bq, Integer.MAX_VALUE);
+                    TopDocs docs = searcher.search(complex, Integer.MAX_VALUE);
                     int totalHits = docs.totalHits;
 //                    System.out.println(totalHits);
                     if (totalHits >= 20000) {
@@ -115,18 +117,18 @@ public class SearchService {
     }
 
     public Integer getSearch(String keyword, QueryParser parser, IndexSearcher searcher) {
-        BooleanClause complex = getDissClause("complex", keyword.trim(), parser);
-        List<BooleanClause> clauseList = new ArrayList<>();
+        Query complex = getDissClause("complex", keyword.trim(), parser);
+//        List<BooleanClause> clauseList = new ArrayList<>();
         if (null != complex) {
-            clauseList.clear();
-            clauseList.add(complex);
-            BooleanQuery.Builder builder = new BooleanQuery.Builder();
-            clauseList.forEach(builder::add);
-            BooleanQuery bq = builder.build();
+//            clauseList.clear();
+//            clauseList.add(complex);
+//            BooleanQuery.Builder builder = new BooleanQuery.Builder();
+//            clauseList.forEach(builder::add);
+//            BooleanQuery bq = builder.build();
             //search
             try {
                 //searching
-                TopDocs docs = searcher.search(bq, Integer.MAX_VALUE);
+                TopDocs docs = searcher.search(complex, Integer.MAX_VALUE);
                 int totalHits = docs.totalHits;
                 return totalHits;
             } catch (IOException e) {
@@ -163,8 +165,8 @@ public class SearchService {
         }
     }
 
-    private BooleanClause getDissClause(String fieldName, String keyword, QueryParser parser) {
-        BooleanClause.Occur occur = logic2ClauseOccur("and");
+    private Query getDissClause(String fieldName, String keyword, QueryParser parser) {
+//        BooleanClause.Occur occur = logic2ClauseOccur("and");
         try {
             Query q = null;
             switch (fieldName) {
@@ -204,8 +206,8 @@ public class SearchService {
                     break;
             }
             if (null != q) ;
-            BooleanClause clause = new BooleanClause(q, occur);
-            return clause;
+//            BooleanClause clause = new BooleanClause(q, occur);
+            return q;
         } catch (Exception ex) {
             return null;
         }

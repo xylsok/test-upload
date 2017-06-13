@@ -222,6 +222,6 @@ public class SearchService {
     }
 
     public List<Keword> getRetrieve2(Integer num) {
-        return KwordDao.getKeword(num);
+        return kwordDao.get12(num);
     }
 }

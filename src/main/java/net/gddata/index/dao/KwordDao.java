@@ -47,7 +47,7 @@ public class KwordDao extends JooqDao<KwordRecord, Keword, Integer> {
     }
 
 
-    public List<Keword> getKeword(Integer num) {
+    public  List<Keword> get12(Integer num) {
         Result<KwordRecord> fetch = create().selectFrom(KWORD).limit(num).fetch();
         return null != fetch ? fetch.into(Keword.class) : new ArrayList<>();
     }

@@ -12,5 +12,5 @@ import java.util.Set;
 public class SubInfo {
     private String cnKw;
     private String enKw;
-    private Set<Integer> ids;
+    private Set<String> ids;
 }

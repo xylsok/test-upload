@@ -1,6 +1,5 @@
 package net.gddata.index.service;
 
-import lombok.Data;
 import net.gddata.index.dao.KwordDao;
 import net.gddata.index.dao.Master201601Dao;
 import net.gddata.index.model.*;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Created by zhangzf on 16/12/12.
@@ -135,7 +133,7 @@ public class SearchService {
         return null;
     }
 
-    public Set<Integer> getSearch3(String keyword, QueryParser parser, IndexSearcher searcher, String fieldName) {
+    public Set<String> getSearch3(String keyword, QueryParser parser, IndexSearcher searcher, String fieldName) {
         Query complex = getDissClause(fieldName, keyword.trim(), parser);
         if (null != complex) {
             //search
@@ -143,11 +141,11 @@ public class SearchService {
                 //searching
                 TopDocs docs = searcher.search(complex, Integer.MAX_VALUE);
                 int totalHits = docs.totalHits;
-                Set<Integer> ids = new HashSet<>();
+                Set<String> ids = new HashSet<>();
                 for (int i = 0; i < docs.scoreDocs.length; i++) {
                     Document doc = searcher.doc(docs.scoreDocs[i].doc);
-                    String id = doc.get("id");
-                    ids.add(Integer.valueOf(id));
+                    String gui = doc.get("gui");
+                    ids.add(gui);
                 }
                 return ids;
             } catch (IOException e) {
@@ -315,19 +313,19 @@ public class SearchService {
                     //拿单个中文关键词换多个英文关键词
                     String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
                     if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
-                        Set<Integer> resoult = new HashSet();
+                        Set<String> resoult = new HashSet();
                         SubInfo subInfo = new SubInfo();
                         //得到英文词并处理好
                         String keyword = checkKeyword(kewordByCnKw.trim());
                         keyword = keyword.replace("\"\"", "");
-                        System.out.println("处理好的英文词" + keyword);
-                        Set<Integer> title = getSearch3(keyword, parser, searcher, "title");
-                        Set<Integer> description = getSearch3(keyword, parser, searcher, "description");
-                        Set<Integer> subject = getSearch3(keyword, parser, searcher, "subject");
+//                        System.out.println("处理好的英文词" + keyword);
+                        Set<String> title = getSearch3(keyword, parser, searcher, "title");
+                        Set<String> description = getSearch3(keyword, parser, searcher, "description");
+                        Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
                         resoult.addAll(title);
                         resoult.addAll(description);
                         resoult.retainAll(subject); //第一次算交集
-                        System.out.println(resoult);
+//                        System.out.println(resoult);
 
                         subInfo.setCnKw(r.trim());
                         subInfo.setEnKw(keyword);
@@ -337,46 +335,73 @@ public class SearchService {
                 }
             }
             keTeLog.setList(list);
-            if (master.getId() % 10 == 0) {
-                indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog"+master.getId()+".txt");
-            } else {
-                indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog.txt");
-            }
+            indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog"+random()+".txt");
 
+            Set<String> ketilist   = new HashSet<>();
+            if(list.size()>0){
+                for (int i = 0; i < list.size(); i++) {
+                    SubInfo subInfo = list.get(i);
+                    if(i==list.size()-1){
+                        ketilist.retainAll(subInfo.getIds());
+                    }else {
+                        ketilist.addAll(subInfo.getIds());
+                    }
+                }
+                Keti k = new Keti();
+                k.setId(master.getId());
+                k.setKeywords2(master.getKeywords2());
+                k.setGuis(ketilist);
+                indexUtils.ObjectSerialization2(k, "/data/log/sublog"+random()+".txt");
+            }
             return null;
         }
         return null;
     }
 
 
+    public int random(){
+        java.util.Random random=new java.util.Random();// 定义随机类
+        int result=random.nextInt(15);// 返回[0,10)集合中的整数，注意不包括10
+        return result;
+    }
+
     @Test
     public void ssss() {
-        /*Set<Integer> result = new HashSet<Integer>();
-        Set<Integer> set1 = new HashSet<Integer>(){{
-            add(1);
-            add(3);
-            add(5);
+        Set<String> result = new HashSet<String>();
+        Set<String> set1 = new HashSet<String>(){{
+            add("1");
+            add("2");
+            add("3");
         }};
 
-        Set<Integer> set2 = new HashSet<Integer>(){{
-            add(1);
-            add(2);
-            add(3);
+        Set<String> set2 = new HashSet<String>(){{
+            add("2");
+            add("3");
+            add("4");
+        }};
+
+        Set<String> set3 = new HashSet<String>(){{
+            add("3");
+            add("4");
+            add("5");
         }};
 
         result.clear();
         result.addAll(set1);
-        result.retainAll(set2);
+        result.addAll(set2);
+        result.retainAll(set3);
         System.out.println("交集："+result);
 
         result.clear();
         result.addAll(set1);
-        result.removeAll(set2);
+        result.addAll(set2);
+        result.removeAll(set3);
         System.out.println("差集："+result);
 
         result.clear();
         result.addAll(set1);
         result.addAll(set2);
-        System.out.println("并集："+result);*/
+        result.addAll(set3);
+        System.out.println("并集："+result);
     }
 }

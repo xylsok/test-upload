@@ -301,7 +301,7 @@ public class SearchService {
         if (null != master) {
             String keywords = master.getKeywords2();
             String[] split = {};
-            if(null!=keywords&&!"".equals(keywords)){
+            if (null != keywords && !"".equals(keywords)) {
                 split = keywords.split("；");
             }
 
@@ -320,7 +320,7 @@ public class SearchService {
                         //得到英文词并处理好
                         String keyword = checkKeyword(kewordByCnKw.trim());
                         keyword = keyword.replace("\"\"", "");
-                        System.out.println("处理好的英文词"+keyword);
+                        System.out.println("处理好的英文词" + keyword);
                         Set<Integer> title = getSearch3(keyword, parser, searcher, "title");
                         Set<Integer> description = getSearch3(keyword, parser, searcher, "description");
                         Set<Integer> subject = getSearch3(keyword, parser, searcher, "subject");
@@ -337,7 +337,12 @@ public class SearchService {
                 }
             }
             keTeLog.setList(list);
-            indexUtils.ObjectSerialization2(keTeLog,"/data/log/sublog/sublog.txt");
+            if (master.getId() % 10 == 0) {
+                indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog"+master.getId()+".txt");
+            } else {
+                indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog.txt");
+            }
+
             return null;
         }
         return null;

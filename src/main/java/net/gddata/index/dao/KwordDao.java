@@ -2,6 +2,8 @@ package net.gddata.index.dao;
 
 import net.gddata.index.model.Keword;
 import net.gddata.kw.tables.records.KwordRecord;
+import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Result;
 import org.springframework.stereotype.Component;
@@ -50,5 +52,19 @@ public class KwordDao extends JooqDao<KwordRecord, Keword, Integer> {
     public  List<Keword> get12(Integer num) {
         Result<KwordRecord> fetch = create().selectFrom(KWORD).limit(num).fetch();
         return null != fetch ? fetch.into(Keword.class) : new ArrayList<>();
+    }
+
+    public String getKewordByCnKw(String keword){
+        Result<Record1<String>> fetch = create().select(KWORD.SCH_KW).from(KWORD).where(KWORD.CN_KW.eq(keword)).fetch();
+        if(null!=fetch){
+            List<Keword> into = fetch.into(Keword.class);
+            if(into.size()>0){
+                String schKw = into.get(0).getSchKw();
+                return schKw;
+            }else {
+                return null;
+            }
+        }
+        return null;
     }
 }

@@ -22,6 +22,7 @@ public class ArticleSearchWeb {
     @Autowired
     SearchService searchService;
 
+
     @ApiIgnore
     @ApiOperation(value = "搜索文章", notes = "高级搜索与快速搜索")
     @RequestMapping(value = "/search", method = RequestMethod.GET)
@@ -41,5 +42,13 @@ public class ArticleSearchWeb {
     public List<Keword> getRetrieve2(@ApiParam("条数") @RequestParam(value = "num",defaultValue = "20",required = false) Integer num ) {
         return searchService.getRetrieve2(num);
     }
+
+
+    @ApiOperation(value = "搜索文章", notes = "高级搜索与快速搜索")
+    @RequestMapping(value = "/search2", method = RequestMethod.GET)
+    public void retrieve2() {
+        searchService.searchArticls2();
+    }
+
 
 }

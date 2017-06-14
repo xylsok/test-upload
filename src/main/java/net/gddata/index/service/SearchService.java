@@ -1,21 +1,27 @@
 package net.gddata.index.service;
 
+import lombok.Data;
 import net.gddata.index.dao.KwordDao;
-import net.gddata.index.model.Keword;
-import net.gddata.index.model.SubIndex;
+import net.gddata.index.dao.Master201601Dao;
+import net.gddata.index.model.*;
 import net.gddata.index.utils.IndexUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Created by zhangzf on 16/12/12.
@@ -27,6 +33,9 @@ public class SearchService {
 
     @Autowired
     KwordDao kwordDao;
+
+    @Autowired
+    Master201601Dao master201601Dao;
 
     private boolean createIndexState = false;
 
@@ -126,6 +135,28 @@ public class SearchService {
         return null;
     }
 
+    public Set<Integer> getSearch3(String keyword, QueryParser parser, IndexSearcher searcher, String fieldName) {
+        Query complex = getDissClause(fieldName, keyword.trim(), parser);
+        if (null != complex) {
+            //search
+            try {
+                //searching
+                TopDocs docs = searcher.search(complex, Integer.MAX_VALUE);
+                int totalHits = docs.totalHits;
+                Set<Integer> ids = new HashSet<>();
+                for (int i = 0; i < docs.scoreDocs.length; i++) {
+                    Document doc = searcher.doc(docs.scoreDocs[i].doc);
+                    String id = doc.get("id");
+                    ids.add(Integer.valueOf(id));
+                }
+                return ids;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     public IndexSearcher getSearchers(List<SubIndex> indexList) {
         List<IndexReader> list = new ArrayList<>();
         for (SubIndex subIndex : indexList) {
@@ -157,6 +188,20 @@ public class SearchService {
         try {
             Query q = null;
             switch (fieldName) {
+                case "title":
+                    q = parser.parse("title:(" + keyword + ")");
+                    break;
+                case "description":
+                    q = parser.parse("description:(" + keyword + ")");
+                    break;
+                case "subject":
+                    Query subject = parser.parse("subject:(" + keyword + ")");
+                    Query msubject = parser.parse("msubject:(" + keyword + ")");
+                    q = new BooleanQuery.Builder()
+                            .add(subject, BooleanClause.Occur.SHOULD)
+                            .add(msubject, BooleanClause.Occur.SHOULD)
+                            .build();
+                    break;
                 case "complex":
                     Query q1 = parser.parse("title:(\"" + keyword + "\")");
                     Query q2 = parser.parse("description:(\"" + keyword + "\")");
@@ -223,5 +268,110 @@ public class SearchService {
 
     public List<Keword> getRetrieve2(Integer num) {
         return kwordDao.get12(num);
+    }
+
+    private boolean search2 = false;
+
+    //1 开始
+    public void searchArticls2() {
+        if (search2) {
+            System.out.println("有一个任务正工作");
+            return;
+        }
+        search2 = true;
+
+        List<SubIndex> indexes = indexUtils.getIndexs();
+        if (indexes.size() == 0) {
+            System.out.println("没有可用的索引");
+        }
+        IndexSearcher searcher = getSearchers(indexes);
+        Analyzer analyzer = new StandardAnalyzer();
+        String defaultField = "title";
+        QueryParser parser = new QueryParser(defaultField, analyzer);
+
+        List<Master201601> list = master201601Dao.getDate();
+        for (Master201601 master : list) {
+            forKeywords(master, searcher, parser);
+        }
+
+    }
+
+    //2 查询英文词
+    public Set<Integer> forKeywords(Master201601 master, IndexSearcher searcher, QueryParser parser) {
+        if (null != master) {
+            String keywords = master.getKeywords2();
+            String[] split = {};
+            if(null!=keywords&&!"".equals(keywords)){
+                split = keywords.split("；");
+            }
+
+            KeTeLog keTeLog = new KeTeLog();
+            keTeLog.setId(master.getId());
+            keTeLog.setKeywords2(master.getKeywords2());
+            //循环一个词课题里的多个词 r 为每一个中文关键词
+            List<SubInfo> list = new ArrayList();
+            for (String r : split) {
+                if (null != r && !"".equals(r)) {
+                    //拿单个中文关键词换多个英文关键词
+                    String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
+                    if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
+                        Set<Integer> resoult = new HashSet();
+                        SubInfo subInfo = new SubInfo();
+                        //得到英文词并处理好
+                        String keyword = checkKeyword(kewordByCnKw.trim());
+                        keyword = keyword.replace("\"\"", "");
+                        System.out.println("处理好的英文词"+keyword);
+                        Set<Integer> title = getSearch3(keyword, parser, searcher, "title");
+                        Set<Integer> description = getSearch3(keyword, parser, searcher, "description");
+                        Set<Integer> subject = getSearch3(keyword, parser, searcher, "subject");
+                        resoult.addAll(title);
+                        resoult.addAll(description);
+                        resoult.retainAll(subject); //第一次算交集
+                        System.out.println(resoult);
+
+                        subInfo.setCnKw(r.trim());
+                        subInfo.setEnKw(keyword);
+                        subInfo.setIds(resoult);
+                        list.add(subInfo);
+                    }
+                }
+            }
+            keTeLog.setList(list);
+            indexUtils.ObjectSerialization2(keTeLog,"/data/log/sublog/sublog.txt");
+            return null;
+        }
+        return null;
+    }
+
+
+    @Test
+    public void ssss() {
+        /*Set<Integer> result = new HashSet<Integer>();
+        Set<Integer> set1 = new HashSet<Integer>(){{
+            add(1);
+            add(3);
+            add(5);
+        }};
+
+        Set<Integer> set2 = new HashSet<Integer>(){{
+            add(1);
+            add(2);
+            add(3);
+        }};
+
+        result.clear();
+        result.addAll(set1);
+        result.retainAll(set2);
+        System.out.println("交集："+result);
+
+        result.clear();
+        result.addAll(set1);
+        result.removeAll(set2);
+        System.out.println("差集："+result);
+
+        result.clear();
+        result.addAll(set1);
+        result.addAll(set2);
+        System.out.println("并集："+result);*/
     }
 }

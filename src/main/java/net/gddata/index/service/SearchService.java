@@ -290,6 +290,7 @@ public class SearchService {
         List<Master201601> list = master201601Dao.getDate();
         for (Master201601 master : list) {
             forKeywords(master, searcher, parser);
+            System.out.println("masterID:"+master.getId());
         }
 
     }

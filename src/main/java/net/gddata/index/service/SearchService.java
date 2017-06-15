@@ -350,13 +350,12 @@ public class SearchService {
                     hs.put(string, count);
                 }
 
-
                 Keti k = new Keti();
                 k.setDesc(hs.toString());
                 List l = new ArrayList();
                 for (String key : hs.keySet()) {
                     if (hs.get(key) != null & hs.get(key) > 1) {
-                        System.out.print(key + " ");
+//                        System.out.print(key + " ");
                         l.add(key);
                     }
                 }

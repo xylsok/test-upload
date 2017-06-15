@@ -344,7 +344,7 @@ public class SearchService {
             view.setKid(master.getId());
             view.setCnKw(master.getKeywords2());
 
-            System.out.println(list);
+//            System.out.println(list);
             if (list.size() > 0) {
                 for (int i = 0; i < list.size(); i++) {
                     SubInfo subInfo = list.get(i);

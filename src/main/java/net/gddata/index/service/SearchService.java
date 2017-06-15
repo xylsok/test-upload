@@ -324,7 +324,7 @@ public class SearchService {
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
                         resoult.addAll(title);
                         resoult.addAll(description);
-                        resoult.retainAll(subject); //第一次算交集
+                        resoult.addAll(subject); //第一次算交集
 //                        System.out.println(resoult);
 
                         subInfo.setCnKw(r.trim());

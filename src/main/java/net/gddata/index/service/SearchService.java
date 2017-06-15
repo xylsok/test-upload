@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by zhangzf on 16/12/12.
@@ -290,7 +287,7 @@ public class SearchService {
         List<Master201601> list = master201601Dao.getDate();
         for (Master201601 master : list) {
             forKeywords(master, searcher, parser);
-            System.out.println("masterID:"+master.getId());
+            System.out.println("masterID:" + master.getId());
         }
 
     }
@@ -326,7 +323,7 @@ public class SearchService {
                         resoult.addAll(title);
                         resoult.addAll(description);
                         resoult.addAll(subject); //第一次算交集
-//                        System.out.println(resoult);
+//                      System.out.println(resoult);
 
                         subInfo.setCnKw(r.trim());
                         subInfo.setEnKw(keyword);
@@ -336,23 +333,42 @@ public class SearchService {
                 }
             }
             keTeLog.setList(list);
-            indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog"+random()+".txt");
+            indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog" + random() + ".txt");
 
-            Set<String> ketilist   = new HashSet<>();
-            if(list.size()>0){
+            List<String> ketilist = new ArrayList<>();
+            if (list.size() > 0) {
                 for (int i = 0; i < list.size(); i++) {
                     SubInfo subInfo = list.get(i);
-                    if(i==list.size()-1){
-                        ketilist.retainAll(subInfo.getIds());
-                    }else {
-                        ketilist.addAll(subInfo.getIds());
+                    ketilist.addAll(subInfo.getIds());
+                }
+                HashMap<String, Integer> hs = new HashMap<String, Integer>();
+                for (String string : ketilist) {
+                    Integer count = 1;
+                    if (hs.get(string) != null) {
+                        count = hs.get(string) + 1;
+                    }
+                    hs.put(string, count);
+                }
+
+
+                Keti k = new Keti();
+                k.setDesc(hs.toString());
+                List l = new ArrayList();
+                for (String key : hs.keySet()) {
+                    if (hs.get(key) != null & hs.get(key) > 1) {
+                        System.out.print(key + " ");
+                        l.add(key);
                     }
                 }
-                Keti k = new Keti();
+                k.setSize(l.size());
+                if (l.size() > 10) {
+                    k.setGuis(l.subList(0, 9));
+                } else {
+                    k.setGuis(l);
+                }
                 k.setId(master.getId());
                 k.setKeywords2(master.getKeywords2());
-                k.setGuis(ketilist);
-                indexUtils.ObjectSerialization2(k, "/data/log/sublog"+random()+".txt");
+                indexUtils.ObjectSerialization2(k, "/data/log/sublog" + random() + ".txt");
             }
             return null;
         }
@@ -360,15 +376,15 @@ public class SearchService {
     }
 
 
-    public int random(){
-        java.util.Random random=new java.util.Random();// 定义随机类
-        int result=random.nextInt(15);// 返回[0,10)集合中的整数，注意不包括10
+    public int random() {
+        java.util.Random random = new java.util.Random();// 定义随机类
+        int result = random.nextInt(15);// 返回[0,10)集合中的整数，注意不包括10
         return result;
     }
 
     @Test
     public void ssss() {
-        Set<String> result = new HashSet<String>();
+        /*Set<String> result = new HashSet<String>();
         Set<String> set1 = new HashSet<String>(){{
             add("1");
             add("2");
@@ -403,6 +419,31 @@ public class SearchService {
         result.addAll(set1);
         result.addAll(set2);
         result.addAll(set3);
-        System.out.println("并集："+result);
+        System.out.println("并集："+result);*/
+
+        /*List<String> l =new ArrayList<String>();
+        l.add("a") ;
+        l.add("a") ;
+        l.add("b") ;
+        l.add("b") ;
+        l.add("b") ;
+        l.add("c") ;
+        l.add("d") ;
+        l.add("d") ;
+        HashMap<String, Integer> hs = new HashMap<String, Integer>();
+        for (String string : l) {
+            Integer count = 1;
+            if(hs.get(string) != null) {
+                count = hs.get(string) + 1;
+            }
+            hs.put(string, count);
+        }
+        System.out.println(hs.toString());
+        System.out.print("重复的有:");
+        for (String key : hs.keySet()) {
+            if (hs.get(key)!=null&hs.get(key)>1) {
+                System.out.print(key+" ");
+            }
+        }*/
     }
 }

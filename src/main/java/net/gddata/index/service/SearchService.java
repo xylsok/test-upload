@@ -360,7 +360,7 @@ public class SearchService {
                     if (hs.get(key) != null & hs.get(key) > 1) {
 //                        System.out.print(key + " ");
                         Integer integer = hs.get(key);
-                        sb.append(key+"="+integer);
+                        sb.append(key+"="+integer+";     ");
                         l.add(key);
                     }
                 }

@@ -2,6 +2,7 @@ package net.gddata.index.service;
 
 import net.gddata.index.dao.KwordDao;
 import net.gddata.index.dao.Master201601Dao;
+import net.gddata.index.dao.ViewDao;
 import net.gddata.index.model.*;
 import net.gddata.index.utils.IndexUtils;
 import org.apache.lucene.analysis.Analyzer;
@@ -13,6 +14,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -28,6 +30,9 @@ public class SearchService {
 
     @Autowired
     KwordDao kwordDao;
+
+    @Autowired
+    ViewDao viewDao;
 
     @Autowired
     Master201601Dao master201601Dao;
@@ -287,7 +292,6 @@ public class SearchService {
         List<Master201601> list = master201601Dao.getDate();
         for (Master201601 master : list) {
             forKeywords(master, searcher, parser);
-            System.out.println("masterID:" + master.getId());
         }
 
     }
@@ -301,9 +305,9 @@ public class SearchService {
                 split = keywords.split("；");
             }
 
-            KeTeLog keTeLog = new KeTeLog();
-            keTeLog.setId(master.getId());
-            keTeLog.setKeywords2(master.getKeywords2());
+//            KeTeLog keTeLog = new KeTeLog();
+//            keTeLog.setId(master.getId());
+//            keTeLog.setKeywords2(master.getKeywords2());
             //循环一个词课题里的多个词 r 为每一个中文关键词
             List<SubInfo> list = new ArrayList();
             for (String r : split) {
@@ -322,7 +326,7 @@ public class SearchService {
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
                         resoult.addAll(title);
                         resoult.addAll(description);
-                        resoult.addAll(subject); //第一次算交集
+                        resoult.addAll(subject);
 //                      System.out.println(resoult);
 
                         subInfo.setCnKw(r.trim());
@@ -332,17 +336,36 @@ public class SearchService {
                     }
                 }
             }
-            keTeLog.setList(list);
-            indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog" + random() + ".txt");
+//            keTeLog.setList(list);
+//            indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog" + random() + ".txt");
 
             List<String> ketilist = new ArrayList<>();
+            View view = new View();
+            view.setKid(master.getId());
+            view.setCnKw(master.getKeywords2());
+
+            System.out.println(list);
             if (list.size() > 0) {
                 for (int i = 0; i < list.size(); i++) {
                     SubInfo subInfo = list.get(i);
-                    ketilist.addAll(subInfo.getIds());
+                    if (i == list.size()-1) {
+                        ketilist.retainAll(subInfo.getIds());
+                    } else {
+                        ketilist.addAll(subInfo.getIds());
+                    }
+
                 }
+                view.setN1(ketilist.size());//最相关 1
+
+                List<String> list2 = new ArrayList();
+                for (int i = 0; i < list.size(); i++) {
+                    SubInfo subInfo = list.get(i);
+                    list2.addAll(subInfo.getIds());
+                }
+                view.setN2(list2.size());//并集 2
+
                 HashMap<String, Integer> hs = new HashMap<String, Integer>();
-                for (String string : ketilist) {
+                for (String string : list2) {
                     Integer count = 1;
                     if (hs.get(string) != null) {
                         count = hs.get(string) + 1;
@@ -350,29 +373,21 @@ public class SearchService {
                     hs.put(string, count);
                 }
 
-                Keti k = new Keti();
-
-
                 List l = new ArrayList();
-//                StringBuffer sb = new StringBuffer();
                 for (String key : hs.keySet()) {
-                    if (hs.get(key) != null & hs.get(key) == 2) {
-//                        System.out.print(key + " ");
-//                        Integer integer = hs.get(key);
-//                        sb.append(key+"="+integer+";     ");
+                    if (hs.get(key) != null & hs.get(key) == 1) {
                         l.add(key);
                     }
                 }
-//                k.setDesc(sb.toString());
-                k.setSize(l.size());
-                if (l.size() > 10) {
-                    k.setGuis(l.subList(0, 9));
-                } else {
-                    k.setGuis(l);
+                view.setN3(l.size());
+                List l2 = new ArrayList();
+                for (String key : hs.keySet()) {
+                    if (hs.get(key) != null & hs.get(key) > 1) {
+                        l2.add(key);
+                    }
                 }
-                k.setId(master.getId());
-                k.setKeywords2(master.getKeywords2());
-                indexUtils.ObjectSerialization2(k, "/data/log/c2.txt");
+                view.setN4(l2.size());
+                viewDao.save(view);
             }
             return null;
         }

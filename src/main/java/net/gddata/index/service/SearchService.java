@@ -353,11 +353,10 @@ public class SearchService {
                 Keti k = new Keti();
 
 
-
                 List l = new ArrayList();
 //                StringBuffer sb = new StringBuffer();
                 for (String key : hs.keySet()) {
-                    if (hs.get(key) != null & hs.get(key) > 1) {
+                    if (hs.get(key) != null & hs.get(key) == 2) {
 //                        System.out.print(key + " ");
 //                        Integer integer = hs.get(key);
 //                        sb.append(key+"="+integer+";     ");
@@ -373,7 +372,7 @@ public class SearchService {
                 }
                 k.setId(master.getId());
                 k.setKeywords2(master.getKeywords2());
-                indexUtils.ObjectSerialization2(k, "/data/log/sublog" + random() + ".txt");
+                indexUtils.ObjectSerialization2(k, "/data/log/c2.txt");
             }
             return null;
         }

@@ -375,19 +375,22 @@ public class SearchService {
 
                 List l = new ArrayList();
                 for (String key : hs.keySet()) {
-                    if (hs.get(key) != null & hs.get(key) == 1) {
+                    if (hs.get(key) != null & hs.get(key) > 1) {
                         l.add(key);
                     }
                 }
                 view.setN3(l.size());
                 List l2 = new ArrayList();
                 for (String key : hs.keySet()) {
-                    if (hs.get(key) != null & hs.get(key) > 1) {
+                    if (hs.get(key) != null & hs.get(key) == 1) {
                         l2.add(key);
                     }
                 }
                 view.setN4(l2.size());
                 viewDao.save(view);
+                if (master.getId() % 100 == 0) {
+                    System.out.println("masterID"+master.getId());
+                }
             }
             return null;
         }

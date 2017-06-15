@@ -355,16 +355,16 @@ public class SearchService {
 
 
                 List l = new ArrayList();
-                StringBuffer sb = new StringBuffer();
+//                StringBuffer sb = new StringBuffer();
                 for (String key : hs.keySet()) {
                     if (hs.get(key) != null & hs.get(key) > 1) {
 //                        System.out.print(key + " ");
-                        Integer integer = hs.get(key);
-                        sb.append(key+"="+integer+";     ");
+//                        Integer integer = hs.get(key);
+//                        sb.append(key+"="+integer+";     ");
                         l.add(key);
                     }
                 }
-                k.setDesc(sb.toString());
+//                k.setDesc(sb.toString());
                 k.setSize(l.size());
                 if (l.size() > 10) {
                     k.setGuis(l.subList(0, 9));

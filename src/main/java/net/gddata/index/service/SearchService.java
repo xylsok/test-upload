@@ -404,7 +404,7 @@ public class SearchService {
                     keTeLog.setDesc("戊法丁:所有英文词在三个字段中搜索后的值");
                     keTeLog.setSize(sumList.size());
                     keTeLog.setTime(FormatDateTime.betweenTime(now));
-                    indexUtils.ObjectSerialization2(keTeLog, "/data/log/丁.txt");
+                    indexUtils.ObjectSerialization2(keTeLog, "/data/log/戊.txt");
                 }
             }
             if (master.getId() % 100 == 0) {

@@ -163,7 +163,8 @@ public class IndexUtils {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        contentToTxt(filePath,json);
+//        contentToTxt(filePath,json);
+        appendMethodB(filePath,json);
     }
 
     public static void contentToTxt(String filePath, String content) {
@@ -193,6 +194,16 @@ public class IndexUtils {
         }
     }
 
+    public static void appendMethodB(String fileName, String content) {
+        try {
+            //打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件
+            FileWriter writer = new FileWriter(fileName, true);
+            writer.write(content+"\r\n");
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public String checkOrInitIndex(String dbName, String indexid) {

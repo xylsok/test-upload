@@ -304,6 +304,9 @@ public class SearchService {
     //2 查询英文词
     public Set<Integer> forKeywords(Master201601 master, IndexSearcher searcher, QueryParser parser) {
         if (null != master) {
+            View view = new View();
+            view.setKid(master.getId());
+            view.setCnKw(master.getKeywords2());
             String keywords = master.getKeywords2();
             String[] split = {};
             if (null != keywords && !"".equals(keywords)) {
@@ -368,26 +371,34 @@ public class SearchService {
                 /**
                  *   甲算法
                  */
-                arithmetic1(keTeLog, list, now);
+                int i = arithmetic1(keTeLog, list, now);
+                view.setN1(i);
+
                 /**
                  *   已算法
                  */
-                arithmetic2(keTeLog, list, now);
+                int i1 = arithmetic2(keTeLog, list, now);
+                view.setN2(i1);
 
                 /**
                  *   丙算法
                  */
-                arithmetic3(keTeLog, titleList, now, "丙1-title");
-                arithmetic3(keTeLog, descriptionList, now, "丙2-desc");
-                arithmetic3(keTeLog, subjectList, now, "丙3-subject");
-
+                int i2 = arithmetic3(keTeLog, titleList, now, "丙1-title" + random());
+                int i3 = arithmetic3(keTeLog, descriptionList, now, "丙2-desc" + random());
+                int i4 = arithmetic3(keTeLog, subjectList, now, "丙3-subject" + random());
+                view.setN3(i2);
+                view.setN4(i3);
+                view.setN5(i4);
                 /**
                  *  丁算法
                  */
-                arithmetic4(keTeLog, jjTitleList, jjSubjectList, jjDescriptionList, now);
+                int i5 = arithmetic4(keTeLog, jjTitleList, jjSubjectList, jjDescriptionList, now);
+                view.setN6(i5);
+
 
             }
             if (stringBuffer.length() > 0) {
+                view.setEnKw(stringBuffer.toString());
                 Set<String> sumList = getSearch3(stringBuffer.toString(), parser, searcher, "complex2");
                 if (sumList.size() > 0) {
                     /**
@@ -404,18 +415,20 @@ public class SearchService {
                     keTeLog.setDesc("戊法丁:所有英文词在三个字段中搜索后的值");
                     keTeLog.setSize(sumList.size());
                     keTeLog.setTime(FormatDateTime.betweenTime(now));
-                    indexUtils.ObjectSerialization2(keTeLog, "/data/log/戊.txt");
+                    indexUtils.ObjectSerialization2(keTeLog, "/data/log/戊" + random() + ".txt");
+                    view.setN7(sumList.size());
                 }
             }
             if (master.getId() % 100 == 0) {
                 System.out.println("masterID" + master.getId());
             }
+            viewDao.save(view);
             return null;
         }
         return null;
     }
 
-    public void arithmetic1(KeTeLog keTeLog, List<Result> list, Instant now) {
+    public int arithmetic1(KeTeLog keTeLog, List<Result> list, Instant now) {
         List<String> ketilist = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             Result result = list.get(i);
@@ -434,10 +447,11 @@ public class SearchService {
         keTeLog.setDesc("甲算法: 结果交集最相关");
         keTeLog.setSize(ketilist.size());
         keTeLog.setTime(FormatDateTime.betweenTime(now));
-        indexUtils.ObjectSerialization2(keTeLog, "/data/log/甲.txt");
+        indexUtils.ObjectSerialization2(keTeLog, "/data/log/甲" + random() + ".txt");
+        return ketilist.size();
     }
 
-    public void arithmetic2(KeTeLog keTeLog, List<Result> rlist, Instant now) {
+    public int arithmetic2(KeTeLog keTeLog, List<Result> rlist, Instant now) {
         List<String> list = new ArrayList();
         for (int i = 0; i < rlist.size(); i++) {
             Result result = rlist.get(i);
@@ -447,19 +461,20 @@ public class SearchService {
         keTeLog.setDesc("算法乙: 结果并集重复数据>1 次相关");
         keTeLog.setSize(l.size());
         keTeLog.setTime(FormatDateTime.betweenTime(now));
-        indexUtils.ObjectSerialization2(keTeLog, "/data/log/乙.txt");
-
+        indexUtils.ObjectSerialization2(keTeLog, "/data/log/乙" + random() + ".txt");
+        return l.size();
     }
 
-    public void arithmetic3(KeTeLog keTeLog, List<String> list, Instant now, String name) {
+    public int arithmetic3(KeTeLog keTeLog, List<String> list, Instant now, String name) {
         List l = core(list, keTeLog);
         keTeLog.setDesc("算法丙: 结果并集重复数据>1 次相关");
         keTeLog.setSize(l.size());
         keTeLog.setTime(FormatDateTime.betweenTime(now));
         indexUtils.ObjectSerialization2(keTeLog, "/data/log/" + name + ".txt");
+        return l.size();
     }
 
-    public void arithmetic4(KeTeLog keTeLog, List<Set<String>> listT, List<Set<String>> listS, List<Set<String>> listD, Instant now) {
+    public int arithmetic4(KeTeLog keTeLog, List<Set<String>> listT, List<Set<String>> listS, List<Set<String>> listD, Instant now) {
         Set<String> listTt = retainElementList(listT);
         Set<String> listSs = retainElementList(listS);
         Set<String> listDd = retainElementList(listD);
@@ -476,8 +491,8 @@ public class SearchService {
         keTeLog.setDesc("算法丁: (As^Bs^Cs) V (Ad^Bd^Cd) V (At^Bt^Ct)");
         keTeLog.setSize(lsit.size());
         keTeLog.setTime(FormatDateTime.betweenTime(now));
-        indexUtils.ObjectSerialization2(keTeLog, "/data/log/丁.txt");
-
+        indexUtils.ObjectSerialization2(keTeLog, "/data/log/丁" + random() + ".txt");
+        return lsit.size();
     }
 
     public List core(List<String> list, KeTeLog keTeLog) {

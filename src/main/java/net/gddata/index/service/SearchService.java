@@ -1,5 +1,6 @@
 package net.gddata.index.service;
 
+import net.gddata.common.util.FormatDateTime.FormatDateTime;
 import net.gddata.index.dao.KwordDao;
 import net.gddata.index.dao.Master201601Dao;
 import net.gddata.index.dao.ViewDao;
@@ -14,10 +15,10 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -94,7 +95,9 @@ public class SearchService {
         for (String s : split) {
             stringBuffer.append("\"" + s.trim() + "\"" + " ");
         }
-        return stringBuffer.toString();
+        String string = stringBuffer.toString();
+        string = string.replace("\"\"", "");
+        return string;
     }
 
     public Boolean getSearchItem(String keyword, QueryParser parser, IndexSearcher searcher) {
@@ -305,61 +308,65 @@ public class SearchService {
                 split = keywords.split("；");
             }
 
-//            KeTeLog keTeLog = new KeTeLog();
-//            keTeLog.setId(master.getId());
-//            keTeLog.setKeywords2(master.getKeywords2());
-            //循环一个词课题里的多个词 r 为每一个中文关键词
-            List<SubInfo> list = new ArrayList();
+            KeTeLog keTeLog = new KeTeLog();
+            keTeLog.setId(master.getId());
+            keTeLog.setKeywords2(keywords);
+
+            //循环一个课题里的多个中文词 r 为每一个中文关键词
+            List<Result> list = new ArrayList();
+            Instant now = Instant.now();
             for (String r : split) {
                 if (null != r && !"".equals(r)) {
                     //拿单个中文关键词换多个英文关键词
                     String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
                     if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
-                        Set<String> resoult = new HashSet();
-                        SubInfo subInfo = new SubInfo();
+                        Set<String> resoultList = new HashSet();
+                        //存储
+                        Result result = new Result();
+
                         //得到英文词并处理好
                         String keyword = checkKeyword(kewordByCnKw.trim());
-                        keyword = keyword.replace("\"\"", "");
-//                        System.out.println("处理好的英文词" + keyword);
                         Set<String> title = getSearch3(keyword, parser, searcher, "title");
                         Set<String> description = getSearch3(keyword, parser, searcher, "description");
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
-                        resoult.addAll(title);
-                        resoult.addAll(description);
-                        resoult.addAll(subject);
-//                      System.out.println(resoult);
 
-                        subInfo.setCnKw(r.trim());
-                        subInfo.setEnKw(keyword);
-                        subInfo.setIds(resoult);
-                        list.add(subInfo);
+                        //并集
+                        resoultList.addAll(title);
+                        resoultList.addAll(description);
+                        resoultList.addAll(subject);
+
+                        result.setIds(resoultList);
+                        list.add(result);
                     }
                 }
             }
-//            keTeLog.setList(list);
-//            indexUtils.ObjectSerialization2(keTeLog, "/data/log/sublog/sublog" + random() + ".txt");
-
-            List<String> ketilist = new ArrayList<>();
-            View view = new View();
-            view.setKid(master.getId());
-            view.setCnKw(master.getKeywords2());
-
-//            System.out.println(list);
             if (list.size() > 0) {
+                List<String> ketilist = new ArrayList<>();
                 for (int i = 0; i < list.size(); i++) {
-                    SubInfo subInfo = list.get(i);
-                    if (i == list.size()-1) {
-                        ketilist.retainAll(subInfo.getIds());
+                    Result result = list.get(i);
+                    if (i == list.size() - 1) {
+                        ketilist.retainAll(result.getIds());
                     } else {
-                        ketilist.addAll(subInfo.getIds());
+                        ketilist.addAll(result.getIds());
                     }
 
                 }
-                view.setN1(ketilist.size());//最相关 1
+                //仅放前5个
+                if (ketilist.size() > 5) {
+                    keTeLog.setGuis(ketilist.subList(0, 5));
+                } else {
+                    keTeLog.setGuis(ketilist);
+                }
+                keTeLog.setDesc("甲算法 结果交集最相关");
+                keTeLog.setSize(ketilist.size());
+                keTeLog.setTime(FormatDateTime.betweenTime(now));
+                indexUtils.ObjectSerialization2(keTeLog, "/data/log/甲.txt");
 
-                List<String> list2 = new ArrayList();
+
+
+                /*List<String> list2 = new ArrayList();
                 for (int i = 0; i < list.size(); i++) {
-                    SubInfo subInfo = list.get(i);
+                    Result subInfo = list.get(i);
                     list2.addAll(subInfo.getIds());
                 }
                 view.setN2(list2.size());//并集 2
@@ -388,8 +395,9 @@ public class SearchService {
                 }
                 view.setN4(l2.size());
                 viewDao.save(view);
+               */
                 if (master.getId() % 100 == 0) {
-                    System.out.println("masterID"+master.getId());
+                    System.out.println("masterID" + master.getId());
                 }
             }
             return null;
@@ -467,5 +475,16 @@ public class SearchService {
                 System.out.print(key+" ");
             }
         }*/
+    }
+
+    @Test
+    public void run() {
+        List list = new ArrayList();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        list.add("4");
+        List list1 = list.subList(0, 4);
+        System.out.println(list1);
     }
 }

@@ -395,7 +395,7 @@ public class SearchService {
                      */
                     //仅放前5个
                     List<String> list2 = new ArrayList();
-                    subjectList.forEach(list2::add);
+                    sumList.forEach(list2::add);
                     if (list2.size() > 5) {
                         keTeLog.setGuis(list2.subList(0, 5));
                     } else {

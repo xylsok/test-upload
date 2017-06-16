@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Created by zhangzf on 16/12/12.
  */
@@ -310,11 +312,20 @@ public class SearchService {
 
             KeTeLog keTeLog = new KeTeLog();
             keTeLog.setId(master.getId());
-            keTeLog.setKeywords2(keywords);
-
             //循环一个课题里的多个中文词 r 为每一个中文关键词
             List<Result> list = new ArrayList();
+            //开始计时
             Instant now = Instant.now();
+
+            List<String> titleList = new ArrayList();
+            List<String> descriptionList = new ArrayList();
+            List<String> subjectList = new ArrayList();
+
+            List<Set<String>> jjTitleList = new ArrayList();
+            List<Set<String>> jjDescriptionList = new ArrayList();
+            List<Set<String>> jjSubjectList = new ArrayList();
+
+            StringBuffer stringBuffer = new StringBuffer();
             for (String r : split) {
                 if (null != r && !"".equals(r)) {
                     //拿单个中文关键词换多个英文关键词
@@ -325,12 +336,23 @@ public class SearchService {
                         Result result = new Result();
 
                         //得到英文词并处理好
+                        now = Instant.now();//查询开始时间
                         String keyword = checkKeyword(kewordByCnKw.trim());
+                        stringBuffer.append(keyword + " ");
                         Set<String> title = getSearch3(keyword, parser, searcher, "title");
                         Set<String> description = getSearch3(keyword, parser, searcher, "description");
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
 
-                        //并集
+
+                        /**
+                         * 总： std算并集
+                         */
+                        title.forEach(titleList::add);
+                        description.forEach(descriptionList::add);
+                        subjectList.forEach(subjectList::add);
+
+
+                        //s d t 算并集
                         resoultList.addAll(title);
                         resoultList.addAll(description);
                         resoultList.addAll(subject);
@@ -340,71 +362,148 @@ public class SearchService {
                     }
                 }
             }
+
+
             if (list.size() > 0) {
-                List<String> ketilist = new ArrayList<>();
-                for (int i = 0; i < list.size(); i++) {
-                    Result result = list.get(i);
-                    if (i == list.size() - 1) {
-                        ketilist.retainAll(result.getIds());
+                /**
+                 *   甲算法
+                 */
+                arithmetic1(keTeLog, list, now);
+                /**
+                 *   已算法
+                 */
+                arithmetic2(keTeLog, list, now);
+
+                /**
+                 *   丙算法
+                 */
+                arithmetic3(keTeLog, titleList, now, "丙1-title");
+                arithmetic3(keTeLog, descriptionList, now, "丙2-desc");
+                arithmetic3(keTeLog, subjectList, now, "丙3-subject");
+
+                /**
+                 *  丁算法
+                 */
+                arithmetic4(keTeLog, jjTitleList, jjSubjectList, jjDescriptionList, now);
+
+            }
+            if (stringBuffer.length() > 0) {
+                Set<String> sumList = getSearch3(stringBuffer.toString(), parser, searcher, "complex2");
+                if (sumList.size() > 0) {
+                    /**
+                     * 戊算法
+                     */
+                    //仅放前5个
+                    List<String> list2 = new ArrayList();
+                    subjectList.forEach(list2::add);
+                    if (list2.size() > 5) {
+                        keTeLog.setGuis(list2.subList(0, 5));
                     } else {
-                        ketilist.addAll(result.getIds());
+                        keTeLog.setGuis(list2);
                     }
-
+                    keTeLog.setDesc("戊法丁:所有英文词在三个字段中搜索后的值");
+                    keTeLog.setSize(sumList.size());
+                    keTeLog.setTime(FormatDateTime.betweenTime(now));
+                    indexUtils.ObjectSerialization2(keTeLog, "/data/log/丁.txt");
                 }
-                //仅放前5个
-                if (ketilist.size() > 5) {
-                    keTeLog.setGuis(ketilist.subList(0, 5));
-                } else {
-                    keTeLog.setGuis(ketilist);
-                }
-                keTeLog.setDesc("甲算法 结果交集最相关");
-                keTeLog.setSize(ketilist.size());
-                keTeLog.setTime(FormatDateTime.betweenTime(now));
-                indexUtils.ObjectSerialization2(keTeLog, "/data/log/甲.txt");
-
-
-
-                /*List<String> list2 = new ArrayList();
-                for (int i = 0; i < list.size(); i++) {
-                    Result subInfo = list.get(i);
-                    list2.addAll(subInfo.getIds());
-                }
-                view.setN2(list2.size());//并集 2
-
-                HashMap<String, Integer> hs = new HashMap<String, Integer>();
-                for (String string : list2) {
-                    Integer count = 1;
-                    if (hs.get(string) != null) {
-                        count = hs.get(string) + 1;
-                    }
-                    hs.put(string, count);
-                }
-
-                List l = new ArrayList();
-                for (String key : hs.keySet()) {
-                    if (hs.get(key) != null & hs.get(key) > 1) {
-                        l.add(key);
-                    }
-                }
-                view.setN3(l.size());
-                List l2 = new ArrayList();
-                for (String key : hs.keySet()) {
-                    if (hs.get(key) != null & hs.get(key) == 1) {
-                        l2.add(key);
-                    }
-                }
-                view.setN4(l2.size());
-                viewDao.save(view);
-               */
-                if (master.getId() % 100 == 0) {
-                    System.out.println("masterID" + master.getId());
-                }
+            }
+            if (master.getId() % 100 == 0) {
+                System.out.println("masterID" + master.getId());
             }
             return null;
         }
         return null;
     }
 
+    public void arithmetic1(KeTeLog keTeLog, List<Result> list, Instant now) {
+        List<String> ketilist = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            Result result = list.get(i);
+            if (i == list.size() - 1) {
+                ketilist.retainAll(result.getIds());
+            } else {
+                ketilist.addAll(result.getIds());
+            }
+        }
+        //仅放前5个
+        if (ketilist.size() > 5) {
+            keTeLog.setGuis(ketilist.subList(0, 5));
+        } else {
+            keTeLog.setGuis(ketilist);
+        }
+        keTeLog.setDesc("甲算法: 结果交集最相关");
+        keTeLog.setSize(ketilist.size());
+        keTeLog.setTime(FormatDateTime.betweenTime(now));
+        indexUtils.ObjectSerialization2(keTeLog, "/data/log/甲.txt");
+    }
+
+    public void arithmetic2(KeTeLog keTeLog, List<Result> rlist, Instant now) {
+        List<String> list = new ArrayList();
+        for (int i = 0; i < rlist.size(); i++) {
+            Result result = rlist.get(i);
+            list.addAll(result.getIds());
+        }
+        List l = core(list, keTeLog);
+        keTeLog.setDesc("算法乙: 结果并集重复数据>1 次相关");
+        keTeLog.setSize(l.size());
+        keTeLog.setTime(FormatDateTime.betweenTime(now));
+        indexUtils.ObjectSerialization2(keTeLog, "/data/log/乙.txt");
+
+    }
+
+    public void arithmetic3(KeTeLog keTeLog, List<String> list, Instant now, String name) {
+        List l = core(list, keTeLog);
+        keTeLog.setDesc("算法丙: 结果并集重复数据>1 次相关");
+        keTeLog.setSize(l.size());
+        keTeLog.setTime(FormatDateTime.betweenTime(now));
+        indexUtils.ObjectSerialization2(keTeLog, "/data/log/" + name + ".txt");
+    }
+
+    public void arithmetic4(KeTeLog keTeLog, List<Set<String>> listT, List<Set<String>> listS, List<Set<String>> listD, Instant now) {
+        Set<String> listTt = retainElementList(listT);
+        Set<String> listSs = retainElementList(listS);
+        Set<String> listDd = retainElementList(listD);
+        List lsit = new ArrayList();
+        listTt.forEach(lsit::add);
+        listSs.forEach(lsit::add);
+        listDd.forEach(lsit::add);
+        //仅放前5个
+        if (lsit.size() > 5) {
+            keTeLog.setGuis(lsit.subList(0, 5));
+        } else {
+            keTeLog.setGuis(lsit);
+        }
+        keTeLog.setDesc("算法丁: (As^Bs^Cs) V (Ad^Bd^Cd) V (At^Bt^Ct)");
+        keTeLog.setSize(lsit.size());
+        keTeLog.setTime(FormatDateTime.betweenTime(now));
+        indexUtils.ObjectSerialization2(keTeLog, "/data/log/丁.txt");
+
+    }
+
+    public List core(List<String> list, KeTeLog keTeLog) {
+        HashMap<String, Integer> hs = new HashMap<String, Integer>();
+        for (String string : list) {
+            Integer count = 1;
+            if (hs.get(string) != null) {
+                count = hs.get(string) + 1;
+            }
+            hs.put(string, count);
+        }
+
+        List l = new ArrayList();
+        for (String key : hs.keySet()) {
+            if (hs.get(key) != null & hs.get(key) > 1) {
+                l.add(key);
+            }
+        }
+        //仅放前5个
+        if (l.size() > 5) {
+            keTeLog.setGuis(l.subList(0, 5));
+        } else {
+            keTeLog.setGuis(l);
+        }
+        return l;
+    }
 
     public int random() {
         java.util.Random random = new java.util.Random();// 定义随机类
@@ -479,12 +578,60 @@ public class SearchService {
 
     @Test
     public void run() {
-        List list = new ArrayList();
-        list.add("1");
-        list.add("2");
-        list.add("3");
-        list.add("4");
-        List list1 = list.subList(0, 4);
-        System.out.println(list1);
+        List<Set<String>> samlist = new ArrayList<>();
+        Set<String> list1 = new HashSet<>();
+        list1.add("1");
+        list1.add("2");
+        list1.add("3");
+        Set<String> list2 = new HashSet<>();
+        list2.add("2");
+        list2.add("3");
+        list2.add("4");
+        Set<String> list3 = new HashSet<>();
+        list3.add("3");
+        list3.add("4");
+        list3.add("5");
+        samlist.add(list1);
+        samlist.add(list2);
+        samlist.add(list3);
+        Set<String> strings = retainElementList(samlist);
+        System.out.println(strings);
+    }
+
+    public List<String> intersection(List<List<String>> lists) {
+        if (lists == null || lists.size() == 0) {
+            return null;
+        }
+        ArrayList<List<String>> arrayList = new ArrayList<>(lists);
+        for (int i = 0; i < arrayList.size(); i++) {
+            List<String> list = arrayList.get(i);
+            // 去除空集合
+            if (list == null || list.size() == 0) {
+                arrayList.remove(list);
+                i--;
+            }
+        }
+        if (arrayList.size() == 0) {
+            return null;
+        }
+        List<String> intersection = arrayList.get(0);
+        // 就只有一个非空集合，结果就是他咯
+        if (arrayList.size() == 1) {
+            return intersection;
+        }
+        // 有多个非空集合，直接挨个交集
+        for (int i = 1; i < arrayList.size() - 1; i++) {
+            intersection.retainAll(arrayList.get(i));
+        }
+        return intersection;
+    }
+
+    public Set<String> retainElementList(List<Set<String>> elementLists) {
+        checkNotNull(elementLists, "elementLists should not be null!");
+        Optional<Set<String>> result = elementLists.parallelStream().filter(elementList -> elementList != null && ((Set) elementList).size() != 0).reduce((a, b) -> {
+            a.retainAll(b);
+            return a;
+        });
+        return result.orElse(new HashSet<>());
     }
 }

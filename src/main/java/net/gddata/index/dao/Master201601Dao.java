@@ -26,7 +26,7 @@ public class Master201601Dao extends JooqDao<Master_201601Record, Master201601, 
     }
 
     public List<Master201601> getDate() {
-        Result<Record2<Integer, String>> fetch = create().select(MASTER_201601.ID, MASTER_201601.KEYWORDS2).from(MASTER_201601).limit(1000).fetch();
+        Result<Record2<Integer, String>> fetch = create().select(MASTER_201601.ID, MASTER_201601.KEYWORDS2).from(MASTER_201601).orderBy(MASTER_201601.ID.asc()).limit(2000).fetch();
         return null != fetch ? fetch.into(Master201601.class) : new ArrayList<>();
     }
 }

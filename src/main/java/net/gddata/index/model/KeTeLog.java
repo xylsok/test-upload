@@ -12,7 +12,7 @@ import java.util.List;
 public class KeTeLog {
     private Integer id;//课题iD
     private int size;
-    private String keywords2;
+//    private String keywords2;
     private List<String> guis;
     private String desc;
     private String time;

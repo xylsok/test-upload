@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhangzf on 16/12/10.
@@ -32,20 +33,26 @@ public class ArticleSearchWeb {
         searchService.searchArticls();
     }
 
-
+    @ApiIgnore
     @ApiOperation(value = "搜索文章数量", notes = "搜索文章数量")
     @RequestMapping(value = "/count", method = RequestMethod.GET)
     public Integer getRetrieve(@RequestParam String keyword) {
         return searchService.getRetrieve(keyword);
     }
-
+    @ApiIgnore
     @ApiOperation(value = "查询列表", notes = "查询列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<Keword> getRetrieve2(@ApiParam("条数") @RequestParam(value = "num", defaultValue = "20", required = false) Integer num) {
         return searchService.getRetrieve2(num);
     }
 
+    @ApiOperation(value = "查询列表", notes = "查询列表")
+    @RequestMapping(value = "/list2", method = RequestMethod.GET)
+    public List<View> getRetrieve3(@ApiParam("条数") @RequestParam(value = "num", defaultValue = "20", required = false) Integer num) {
+        return searchService.getRetrieve3(num);
+    }
 
+    @ApiIgnore
     @ApiOperation(value = "多算法测试搜索文章", notes = "多算法测试搜索文章")
     @RequestMapping(value = "/search2", method = RequestMethod.GET)
     public void retrieve2() {
@@ -57,6 +64,12 @@ public class ArticleSearchWeb {
     private SearchResult searc(@RequestParam("keyword") String keyword) {
         SearchResult searchresult = searchService.search(keyword);
         return searchresult;
+    }
+
+    @ApiOperation(value = "查看各算法占比", notes = "查看各算法占比")
+    @RequestMapping(value = "/getcount", method = RequestMethod.GET)
+    private Map getCount() {
+        return searchService.getCount();
     }
 
 }

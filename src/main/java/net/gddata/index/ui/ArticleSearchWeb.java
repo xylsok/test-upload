@@ -52,7 +52,7 @@ public class ArticleSearchWeb {
         return searchService.getRetrieve3(num);
     }
 
-    @ApiOperation(value = "多算法测试搜索文章", notes = "多算法测试搜索文章")
+    @ApiOperation(value = "多算法测试搜索文章量(重新计算并写表)", notes = "多算法测试搜索文章量(重新计算并写表)")
     @RequestMapping(value = "/search2", method = RequestMethod.GET)
     public void retrieve2() {
         searchService.searchArticls2();

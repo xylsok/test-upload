@@ -367,8 +367,6 @@ public class SearchService {
                         subjectList.forEach(subjectList::add);
 
 
-
-
                         //s d t 算并集
                         resoultList.addAll(title);
                         resoultList.addAll(description);
@@ -792,24 +790,28 @@ public class SearchService {
         Integer n6 = getItemCount("N6");//丁
         Integer n7 = getItemCount("N7");//戊
 
-        map.put("甲:",get(total,n1));
-        map.put("乙:",get(total,n2));
-        map.put("丙1:",get(total,n3));
-        map.put("丙2:",get(total,n4));
-        map.put("丙3:",get(total,n5));
-        map.put("丁:",get(total,n6));
-        map.put("戊:",get(total,n7));
+        map.put("甲:", get(total, n1));
+        map.put("乙:", get(total, n2));
+        map.put("丙1:", get(total, n3));
+        map.put("丙2:", get(total, n4));
+        map.put("丙3:", get(total, n5));
+        map.put("丁:", get(total, n6));
+        map.put("戊:", get(total, n7));
 
-        map.put("测试数量:",total);
+        map.put("甲+乙", get(total, (n1 + n2)));
+        map.put("甲+乙+丙", get(total, (n1 + n2 + n4 + n4 + n5)));
+
+        map.put("测试数量:", total);
 
         return map;
     }
 
-    public String get(Integer total,Integer count){
+    public String get(Integer total, Integer count) {
         return String.valueOf(((float) count / total) * 100);
     }
-    public Integer getItemCount(String t){
-        return   viewDao.getItemCount(t);
+
+    public Integer getItemCount(String t) {
+        return viewDao.getItemCount(t);
     }
 
     public List<View> getRetrieve3(Integer num) {

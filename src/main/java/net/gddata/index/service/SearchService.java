@@ -329,7 +329,8 @@ public class SearchService {
             List<Set<String>> jjSubjectList = new ArrayList();
 
             StringBuffer stringBuffer = new StringBuffer();
-            for (String r : split) {
+            for (int i = 0; i < split.length; i++) {
+                String r = split[i];
                 if (null != r && !"".equals(r)) {
                     //拿单个中文关键词换多个英文关键词
                     String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
@@ -347,12 +348,25 @@ public class SearchService {
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
 
 
+                        if (i == split.length - 1) {
+                            jjTitleList.retainAll(title);
+                            jjDescriptionList.retainAll(description);
+                            jjSubjectList.retainAll(subject);
+                        } else {
+                            jjTitleList.add(title);
+                            jjSubjectList.add(subject);
+                            jjDescriptionList.add(description);
+                        }
+
+
                         /**
                          * 总： std算并集
                          */
                         title.forEach(titleList::add);
                         description.forEach(descriptionList::add);
                         subjectList.forEach(subjectList::add);
+
+
 
 
                         //s d t 算并集
@@ -371,28 +385,28 @@ public class SearchService {
                 /**
                  *   甲算法
                  */
-                int i = arithmetic1(keTeLog, list, now, true);
+                int i = arithmetic1(keTeLog, list, now, false);
                 view.setN1(i);
 
                 /**
                  *   已算法
                  */
-                int i1 = arithmetic2(keTeLog, list, now, true);
+                int i1 = arithmetic2(keTeLog, list, now, false);
                 view.setN2(i1);
 
                 /**
                  *   丙算法
                  */
-                int i2 = arithmetic3(keTeLog, titleList, now, "丙1-title" + random(), true);
-                int i3 = arithmetic3(keTeLog, descriptionList, now, "丙2-desc" + random(), true);
-                int i4 = arithmetic3(keTeLog, subjectList, now, "丙3-subject" + random(), true);
+                int i2 = arithmetic3(keTeLog, titleList, now, "丙1-title" + random(), false);
+                int i3 = arithmetic3(keTeLog, descriptionList, now, "丙2-desc" + random(), false);
+                int i4 = arithmetic3(keTeLog, subjectList, now, "丙3-subject" + random(), false);
                 view.setN3(i2);
                 view.setN4(i3);
                 view.setN5(i4);
                 /**
                  *  丁算法
                  */
-                int i5 = arithmetic4(keTeLog, jjTitleList, jjSubjectList, jjDescriptionList, now, true);
+                int i5 = arithmetic4(keTeLog, jjTitleList, jjSubjectList, jjDescriptionList, now, false);
                 view.setN6(i5);
 
 
@@ -706,7 +720,7 @@ public class SearchService {
                      */
                     title.forEach(titleList::add);
                     description.forEach(descriptionList::add);
-                    subjectList.forEach(subjectList::add);
+                    subject.forEach(subjectList::add);
 
 
                     //s d t 算并集

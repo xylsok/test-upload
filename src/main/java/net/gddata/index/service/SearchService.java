@@ -792,9 +792,9 @@ public class SearchService {
 
         map.put("甲:", get(total, n1));
         map.put("乙:", get(total, n2));
-        map.put("丙1:", get(total, n3));
-        map.put("丙2:", get(total, n4));
-        map.put("丙3:", get(total, n5));
+        map.put("丙1-title:", get(total, n3));
+        map.put("丙2-desc:", get(total, n4));
+        map.put("丙3-subject:", get(total, n5));
         map.put("丁:", get(total, n6));
         map.put("戊:", get(total, n7));
 

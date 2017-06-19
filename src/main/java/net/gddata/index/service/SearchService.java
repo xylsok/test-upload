@@ -431,7 +431,7 @@ public class SearchService {
                     view.setN7(sumList.size());
                 }
             }
-            if (master.getId() % 100 == 0) {
+            if (master.getId() % 10 == 0) {
                 System.out.println("masterID" + master.getId());
             }
             viewDao.save(view);

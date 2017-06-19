@@ -312,7 +312,9 @@ public class SearchService {
             if (null != keywords && !"".equals(keywords)) {
                 split = keywords.split("；");
             }
-
+            if (split.length == 1) {
+                System.out.println(master);
+            }
             KeTeLog keTeLog = new KeTeLog();
             keTeLog.setId(master.getId());
             //循环一个课题里的多个中文词 r 为每一个中文关键词
@@ -347,6 +349,8 @@ public class SearchService {
                         Set<String> description = getSearch3(keyword, parser, searcher, "description");
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
 
+                        title.add("MEDB17060920518173");
+                        title.add("MEDB17060920518522");
 
                         if (i == split.length - 1) {
                             jjTitleList.retainAll(title);
@@ -434,7 +438,7 @@ public class SearchService {
             if (master.getId() % 10 == 0) {
                 System.out.println("masterID" + master.getId());
             }
-            viewDao.save(view);
+//            viewDao.save(view);
             return null;
         }
         return null;
@@ -444,7 +448,7 @@ public class SearchService {
         List<String> ketilist = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             Result result = list.get(i);
-            if (i == list.size() - 1) {
+            if (list.size() > 1 && i == list.size() - 1) {
                 ketilist.retainAll(result.getIds());
             } else {
                 ketilist.addAll(result.getIds());

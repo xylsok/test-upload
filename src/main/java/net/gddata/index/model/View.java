@@ -1,6 +1,11 @@
 package net.gddata.index.model;
 
 import lombok.Data;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by zhangzf on 17/6/15.

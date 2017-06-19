@@ -348,10 +348,6 @@ public class SearchService {
                         Set<String> title = getSearch3(keyword, parser, searcher, "title");
                         Set<String> description = getSearch3(keyword, parser, searcher, "description");
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
-
-                        title.add("MEDB17060920518173");
-                        title.add("MEDB17060920518522");
-
                         if (i == split.length - 1) {
                             jjTitleList.retainAll(title);
                             jjDescriptionList.retainAll(description);
@@ -361,8 +357,6 @@ public class SearchService {
                             jjSubjectList.add(subject);
                             jjDescriptionList.add(description);
                         }
-
-
                         /**
                          * 总： std算并集
                          */

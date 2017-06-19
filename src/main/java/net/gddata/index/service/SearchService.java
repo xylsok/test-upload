@@ -438,7 +438,7 @@ public class SearchService {
             if (master.getId() % 10 == 0) {
                 System.out.println("masterID" + master.getId());
             }
-//            viewDao.save(view);
+            viewDao.save(view);
             return null;
         }
         return null;

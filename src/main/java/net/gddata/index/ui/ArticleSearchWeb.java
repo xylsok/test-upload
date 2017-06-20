@@ -39,6 +39,7 @@ public class ArticleSearchWeb {
     public Integer getRetrieve(@RequestParam String keyword) {
         return searchService.getRetrieve(keyword);
     }
+
     @ApiIgnore
     @ApiOperation(value = "查询列表", notes = "查询列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -51,6 +52,7 @@ public class ArticleSearchWeb {
     public List<View> getRetrieve3(@ApiParam("条数") @RequestParam(value = "num", defaultValue = "20", required = false) Integer num) {
         return searchService.getRetrieve3(num);
     }
+
     @ApiOperation(value = "查询列表2", notes = "查询列表2(keywordds 5个关键词)")
     @RequestMapping(value = "/list3", method = RequestMethod.GET)
     public List<View> getRetrieve4(@ApiParam("条数") @RequestParam(value = "num", defaultValue = "20", required = false) Integer num) {
@@ -62,6 +64,7 @@ public class ArticleSearchWeb {
     public void retrieve2() {
         searchService.searchArticls2("keywords2");
     }
+
     @ApiOperation(value = "多算法测试搜索文章量(使用keywords 重新计算并写表)", notes = "多算法测试搜索文章量(使用keywords 重新计算并写表)")
     @RequestMapping(value = "/keywords", method = RequestMethod.GET)
     public void retrieve5() {
@@ -75,10 +78,16 @@ public class ArticleSearchWeb {
         return searchresult;
     }
 
-    @ApiOperation(value = "查看各算法占比", notes = "查看各算法占比")
+    @ApiOperation(value = "查看各算法占比1", notes = "查看各算法占比")
     @RequestMapping(value = "/getcount", method = RequestMethod.GET)
     private Map getCount() {
         return searchService.getCount();
+    }
+
+    @ApiOperation(value = "查看各算法占比2", notes = "查看各算法占比使用keywords")
+    @RequestMapping(value = "/getcount2", method = RequestMethod.GET)
+    private Map getCount2() {
+        return searchService.getCount2();
     }
 
 }

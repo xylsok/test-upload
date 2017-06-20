@@ -456,6 +456,10 @@ public class SearchService {
 
     public int arithmetic1(KeTeLog keTeLog, List<Result> list, Instant now, boolean isFlag) {
         List<String> ketilist = new ArrayList<>();
+        Result result1 = list.stream().filter(r -> r.getIds().size() == 0).findFirst().orElse(null);
+        if(null!=result1){
+            list.add(result1);
+        }
         for (int i = 0; i < list.size(); i++) {
             Result result = list.get(i);
             if (list.size() > 1 && i == list.size() - 1) {
@@ -795,6 +799,34 @@ public class SearchService {
 
         //总数
         Integer total = viewDao.getTotal();
+        Integer n1 = getItemCount("N1");//甲
+        Integer n2 = getItemCount("N2");//乙
+        Integer n3 = getItemCount("N3");//丙1
+        Integer n4 = getItemCount("N4");//丙2
+        Integer n5 = getItemCount("N5");//丙3
+        Integer n6 = getItemCount("N6");//丁
+        Integer n7 = getItemCount("N7");//戊
+
+        map.put("甲:", get(total, n1));
+        map.put("乙:", get(total, n2));
+        map.put("丙1-title:", get(total, n3));
+        map.put("丙2-desc:", get(total, n4));
+        map.put("丙3-subject:", get(total, n5));
+        map.put("丁:", get(total, n6));
+        map.put("戊:", get(total, n7));
+
+        map.put("甲+乙", get(total, (n1 + n2)));
+        map.put("甲+乙+丙", get(total, (n1 + n2 + n4 + n4 + n5)));
+
+        map.put("测试数量:", total);
+
+        return map;
+    }
+    public Map getCount2() {
+        Map map = new HashMap();
+
+        //总数
+        Integer total = view5Dao.getTotal();
         Integer n1 = getItemCount("N1");//甲
         Integer n2 = getItemCount("N2");//乙
         Integer n3 = getItemCount("N3");//丙1

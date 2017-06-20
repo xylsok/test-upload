@@ -190,7 +190,7 @@ public class SearchService {
     }
 
     private Query getDissClause(String fieldName, String keyword, QueryParser parser) {
-        parser.setDefaultOperator(QueryParser.Operator.OR);
+//        parser.setDefaultOperator(QueryParser.Operator.OR);
         try {
             Query q = null;
             switch (fieldName) {
@@ -306,6 +306,7 @@ public class SearchService {
     //2 查询英文词
     public Set<Integer> forKeywords(Master201601 master, IndexSearcher searcher, QueryParser parser) {
         if (null != master) {
+            master.setKeywords2("簇-有机骨架；组装策略");//todo://sd
             View view = new View();
             view.setKid(master.getId());
             view.setCnKw(master.getKeywords2());
@@ -350,6 +351,7 @@ public class SearchService {
                         Set<String> title = getSearch3(keyword, parser, searcher, "title");
                         Set<String> description = getSearch3(keyword, parser, searcher, "description");
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
+
                         if (i == split.length - 1) {
                             jjTitleList.retainAll(title);
                             jjDescriptionList.retainAll(description);
@@ -711,7 +713,6 @@ public class SearchService {
                     Set<String> title = getSearch3(key, parser, searcher, "title");
                     Set<String> description = getSearch3(key, parser, searcher, "description");
                     Set<String> subject = getSearch3(key, parser, searcher, "subject");
-
 
                     /**
                      * 总： std算并集

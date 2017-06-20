@@ -190,6 +190,7 @@ public class SearchService {
     }
 
     private Query getDissClause(String fieldName, String keyword, QueryParser parser) {
+        parser.setDefaultOperator(QueryParser.Operator.OR);
         try {
             Query q = null;
             switch (fieldName) {
@@ -234,6 +235,7 @@ public class SearchService {
             }
             if (null != q) ;
 //            BooleanClause clause = new BooleanClause(q, occur);
+//            System.out.println(q);
             return q;
         } catch (Exception ex) {
             return null;

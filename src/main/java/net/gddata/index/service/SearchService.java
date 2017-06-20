@@ -306,7 +306,6 @@ public class SearchService {
     //2 查询英文词
     public Set<Integer> forKeywords(Master201601 master, IndexSearcher searcher, QueryParser parser) {
         if (null != master) {
-            master.setKeywords2("簇-有机骨架；组装策略");//todo://sd
             View view = new View();
             view.setKid(master.getId());
             view.setCnKw(master.getKeywords2());

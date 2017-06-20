@@ -827,13 +827,13 @@ public class SearchService {
 
         //总数
         Integer total = view5Dao.getTotal();
-        Integer n1 = getItemCount("N1");//甲
-        Integer n2 = getItemCount("N2");//乙
-        Integer n3 = getItemCount("N3");//丙1
-        Integer n4 = getItemCount("N4");//丙2
-        Integer n5 = getItemCount("N5");//丙3
-        Integer n6 = getItemCount("N6");//丁
-        Integer n7 = getItemCount("N7");//戊
+        Integer n1 = getItemCount2("N1");//甲
+        Integer n2 = getItemCount2("N2");//乙
+        Integer n3 = getItemCount2("N3");//丙1
+        Integer n4 = getItemCount2("N4");//丙2
+        Integer n5 = getItemCount2("N5");//丙3
+        Integer n6 = getItemCount2("N6");//丁
+        Integer n7 = getItemCount2("N7");//戊
 
         map.put("甲:", get(total, n1));
         map.put("乙:", get(total, n2));
@@ -857,6 +857,9 @@ public class SearchService {
 
     public Integer getItemCount(String t) {
         return viewDao.getItemCount(t);
+    }
+    public Integer getItemCount2(String t) {
+        return view5Dao.getItemCount(t);
     }
 
     public List<View> getRetrieve3(Integer num) {

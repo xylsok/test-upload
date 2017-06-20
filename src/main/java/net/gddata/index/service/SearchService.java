@@ -3,6 +3,7 @@ package net.gddata.index.service;
 import net.gddata.common.util.FormatDateTime.FormatDateTime;
 import net.gddata.index.dao.KwordDao;
 import net.gddata.index.dao.Master201601Dao;
+import net.gddata.index.dao.View5Dao;
 import net.gddata.index.dao.ViewDao;
 import net.gddata.index.model.*;
 import net.gddata.index.utils.IndexUtils;
@@ -36,6 +37,9 @@ public class SearchService {
 
     @Autowired
     ViewDao viewDao;
+
+    @Autowired
+    View5Dao view5Dao;
 
     @Autowired
     Master201601Dao master201601Dao;
@@ -280,7 +284,7 @@ public class SearchService {
     private boolean search2 = false;
 
     //1 开始
-    public void searchArticls2() {
+    public void searchArticls2(String keywords) {
         if (search2) {
             System.out.println("有一个任务正工作");
             return;
@@ -295,16 +299,20 @@ public class SearchService {
         Analyzer analyzer = new StandardAnalyzer();
         String defaultField = "title";
         QueryParser parser = new QueryParser(defaultField, analyzer);
-
-        List<Master201601> list = master201601Dao.getDate();
+        List<Master201601> list = null;
+        if ("keywords2".equals(keywords)) {
+            list = master201601Dao.getDate();
+        } else {
+            list = master201601Dao.getDate5();
+        }
         for (Master201601 master : list) {
-            forKeywords(master, searcher, parser);
+            forKeywords(master, searcher, parser, keywords);
         }
 
     }
 
     //2 查询英文词
-    public Set<Integer> forKeywords(Master201601 master, IndexSearcher searcher, QueryParser parser) {
+    public Set<Integer> forKeywords(Master201601 master, IndexSearcher searcher, QueryParser parser, String key) {
         if (null != master) {
             View view = new View();
             view.setKid(master.getId());
@@ -435,7 +443,12 @@ public class SearchService {
             if (master.getId() % 10 == 0) {
                 System.out.println("masterID" + master.getId());
             }
-            viewDao.save(view);
+            if (key.equals("keywords2")) {
+                viewDao.save(view);
+            } else if (key.equals("keywords5")) {
+                view5Dao.save(view);
+            }
+
             return null;
         }
         return null;
@@ -816,5 +829,9 @@ public class SearchService {
 
     public List<View> getRetrieve3(Integer num) {
         return viewDao.getRetrieve3(num);
+    }
+
+    public List<View> getRetrieve4(Integer num) {
+        return view5Dao.getRetrieve3(num);
     }
 }

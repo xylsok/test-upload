@@ -51,11 +51,21 @@ public class ArticleSearchWeb {
     public List<View> getRetrieve3(@ApiParam("条数") @RequestParam(value = "num", defaultValue = "20", required = false) Integer num) {
         return searchService.getRetrieve3(num);
     }
+    @ApiOperation(value = "查询列表2", notes = "查询列表2(keywordds 5个关键词)")
+    @RequestMapping(value = "/list3", method = RequestMethod.GET)
+    public List<View> getRetrieve4(@ApiParam("条数") @RequestParam(value = "num", defaultValue = "20", required = false) Integer num) {
+        return searchService.getRetrieve4(num);
+    }
 
     @ApiOperation(value = "多算法测试搜索文章量(重新计算并写表)", notes = "多算法测试搜索文章量(重新计算并写表)")
     @RequestMapping(value = "/search2", method = RequestMethod.GET)
     public void retrieve2() {
-        searchService.searchArticls2();
+        searchService.searchArticls2("keywords2");
+    }
+    @ApiOperation(value = "多算法测试搜索文章量(使用keywords 重新计算并写表)", notes = "多算法测试搜索文章量(使用keywords 重新计算并写表)")
+    @RequestMapping(value = "/keywords", method = RequestMethod.GET)
+    public void retrieve5() {
+        searchService.searchArticls2("keywords5");
     }
 
     @ApiOperation(value = "根据关键词测试各算法得数", notes = "根据关键词测试各算法得数")

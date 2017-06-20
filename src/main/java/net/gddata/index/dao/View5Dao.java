@@ -31,7 +31,7 @@ public class View5Dao extends JooqDao<View5Record, View, Integer> {
     }
 
     public Integer getItemCount(String t) {
-        String sql = "select count(*) from kw.view where " + t + " >0;";
+        String sql = "select count(*) from kw.view5 where " + t + " >0;";
         Integer into = create().fetchOne(sql).into(Integer.class);
         return into;
     }

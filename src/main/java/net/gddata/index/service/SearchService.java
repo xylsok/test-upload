@@ -359,17 +359,6 @@ public class SearchService {
                         Set<String> description = getSearch3(keyword, parser, searcher, "description");
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
 
-
-
-                        /*if (i == split.length - 1) {
-                            jjTitleList.retainAll(title);
-                            jjDescriptionList.retainAll(description);
-                            jjSubjectList.retainAll(subject);
-                        } else {
-                            jjTitleList.add(title);
-                            jjSubjectList.add(subject);
-                            jjDescriptionList.add(description);
-                        }*/
                         jjTitleList.add(title);
                         jjSubjectList.add(subject);
                         jjDescriptionList.add(description);
@@ -378,7 +367,7 @@ public class SearchService {
                          */
                         title.forEach(titleList::add);
                         description.forEach(descriptionList::add);
-                        subjectList.forEach(subjectList::add);
+                        subject.forEach(subjectList::add);
 
 
                         //s d t 算并集
@@ -878,21 +867,20 @@ public class SearchService {
     }
 
 
-    /*public void ss(){
+    @Test
+    public void ss() {
 
-        List<Result> list = new ArrayList<>();
-        Set<String> result = new HashSet<>();
-        result.add("1");
-        Result result1 = new Result();
-        result1.setIds(result);
-        list.add(result1);
+        Set set = new HashSet();
+        Set set2 = new HashSet();
+        set.add("z");
+        set.add("f");
+        set2.add("f");
+        set2.add("l");
+        List<Set<String>> list = new ArrayList();
+        list.add(set);
+        list.add(set2);
 
-        Set<String> result2 = new HashSet<>();
-        result2.add("4");
-        result2.add("6");
-        Result result12 = new Result();
-        result12.setIds(result2);
-        list.add(result2);
-
-    }*/
+        Set<String> strings = retainElementList(list);
+        System.out.println(strings);
+    }
 }

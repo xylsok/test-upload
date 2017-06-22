@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -887,8 +888,13 @@ public class SearchService {
 
     public void sortingData() {
         Set<String> set = new HashSet();
-        List<Keword> dateAll = kwordDao.getDateAll();
-        List<String> master201601DaoDateAll = master201601Dao.getDateAll();
+        CopyOnWriteArrayList<Keword> dateAll= new CopyOnWriteArrayList();
+        CopyOnWriteArrayList<String> master201601DaoDateAll= new CopyOnWriteArrayList();
+        List<Keword> d = kwordDao.getDateAll();
+        dateAll.addAll(d);
+        List<String> m = master201601Dao.getDateAll();
+        master201601DaoDateAll.addAll(m);
+
         master201601DaoDateAll.stream().forEach(r -> {
             if (null != r && !"".equals(r)) {
                 String[] cnKw = r.split("；");
@@ -902,7 +908,6 @@ public class SearchService {
             }
         });
 
-        List<Keword> list1 = new ArrayList<>();
         for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
             Keword next = it.next();
             if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
@@ -913,11 +918,10 @@ public class SearchService {
                     cnkwToEnKw.setEnKw(next.getEnKw());
                     cnkwToEnKw.setQm(1);
                     cnkwToEnKwDao.save(cnkwToEnKw);
-                    dateAll.remove(s);
+                    dateAll.remove(next);
                 }
             }
         }
-        list1=dateAll;
         for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
             Keword next = it.next();
             if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
@@ -929,7 +933,7 @@ public class SearchService {
                     cnkwToEnKw.setEnKw(next.getEnKw());
                     cnkwToEnKw.setQm(2);
                     cnkwToEnKwDao.save(cnkwToEnKw);
-                    dateAll.remove(s);
+                    dateAll.remove(next);
                 }
             }
         }

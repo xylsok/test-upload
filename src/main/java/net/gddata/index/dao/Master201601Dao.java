@@ -2,6 +2,7 @@ package net.gddata.index.dao;
 
 import net.gddata.index.model.Master201601;
 import net.gddata.kw.tables.records.Master_201601Record;
+import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
@@ -34,5 +35,19 @@ public class Master201601Dao extends JooqDao<Master_201601Record, Master201601, 
     public List<Master201601> getDate5() {
         Result<Record2<Integer, String>> fetch = create().select(MASTER_201601.ID, MASTER_201601.KEYWORDS.as("keywords2")).from(MASTER_201601).where(MASTER_201601.REPLY_ON_ORGAN.like("%福州大学%")).fetch();
         return null != fetch ? fetch.into(Master201601.class) : new ArrayList<>();
+    }
+
+    public List<String> getDateAll() {
+        Result<Record1<String>> fetch = create().select(MASTER_201601.KEYWORDS).from(MASTER_201601).fetch();
+        return null != fetch ? fetch.into(String.class) : new ArrayList<>();
+    }
+
+    public Boolean getLike(String cnKw) {
+        Result<Master_201601Record> fetch = create().selectFrom(MASTER_201601).where(MASTER_201601.KEYWORDS.like("%" + cnKw + "%")).fetch();
+        if (fetch.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

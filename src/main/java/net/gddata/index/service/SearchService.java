@@ -1,10 +1,7 @@
 package net.gddata.index.service;
 
 import net.gddata.common.util.FormatDateTime.FormatDateTime;
-import net.gddata.index.dao.KwordDao;
-import net.gddata.index.dao.Master201601Dao;
-import net.gddata.index.dao.View5Dao;
-import net.gddata.index.dao.ViewDao;
+import net.gddata.index.dao.*;
 import net.gddata.index.model.*;
 import net.gddata.index.utils.IndexUtils;
 import org.apache.lucene.analysis.Analyzer;
@@ -21,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -34,6 +32,9 @@ public class SearchService {
 
     @Autowired
     KwordDao kwordDao;
+
+    @Autowired
+    CnkwToEnKwDao cnkwToEnKwDao;
 
     @Autowired
     ViewDao viewDao;
@@ -882,5 +883,76 @@ public class SearchService {
 
         Set<String> strings = retainElementList(list);
         System.out.println(strings);
+    }
+
+    public void sortingData() {
+        Set<String> set = new HashSet();
+        List<Keword> dateAll = kwordDao.getDateAll();
+        List<String> master201601DaoDateAll = master201601Dao.getDateAll();
+        master201601DaoDateAll.stream().forEach(r -> {
+            if (null != r && !"".equals(r)) {
+                String[] cnKw = r.split("；");
+                if (null != cnKw && cnKw.length > 0) {
+                    for (String s : cnKw) {
+                        if (null != s && !"".equals(s)) {
+                            set.add(s);
+                        }
+                    }
+                }
+            }
+        });
+
+        for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
+            Keword next = it.next();
+            if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
+                String s = set.stream().filter(y -> y.equals(next.getCnKw())).findFirst().orElse(null);
+                if (null != s && !"".equals(s)) {
+                    CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
+                    cnkwToEnKw.setCnKw(next.getCnKw());
+                    cnkwToEnKw.setEnKw(next.getEnKw());
+                    cnkwToEnKw.setQm(1);
+                    cnkwToEnKwDao.save(cnkwToEnKw);
+                    dateAll.remove(s);
+                }
+            }
+        }
+        for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
+            Keword next = it.next();
+            if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
+                String s = set.stream().filter(y -> y.equals(next.getCnKw())).findFirst().orElse(null);
+                Boolean like = master201601Dao.getLike(next.getCnKw());
+                if (like) {
+                    CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
+                    cnkwToEnKw.setCnKw(next.getCnKw());
+                    cnkwToEnKw.setEnKw(next.getEnKw());
+                    cnkwToEnKw.setQm(2);
+                    cnkwToEnKwDao.save(cnkwToEnKw);
+                    dateAll.remove(s);
+                }
+            }
+        }
+        for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
+            Keword next = it.next();
+            if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
+                CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
+                cnkwToEnKw.setCnKw(next.getCnKw());
+                cnkwToEnKw.setEnKw(next.getEnKw());
+                cnkwToEnKw.setQm(3);
+                cnkwToEnKwDao.save(cnkwToEnKw);
+            }
+        }
+    }
+
+    @Test
+    public void qqqq9() {
+        Set<String> set = new HashSet<>();
+        set.add("zhang");
+        set.add("zhen");
+        set.add("zhen2");
+        for (Iterator<String> it = set.iterator(); it.hasNext(); ) {
+            String val = it.next();
+            it.remove();
+            System.out.println(set);
+        }
     }
 }

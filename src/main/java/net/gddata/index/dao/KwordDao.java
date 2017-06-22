@@ -2,14 +2,14 @@ package net.gddata.index.dao;
 
 import net.gddata.index.model.Keword;
 import net.gddata.kw.tables.records.KwordRecord;
-import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.Record2;
-import org.jooq.Result;
+import org.jooq.*;
+import org.junit.Test;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.gddata.kw.tables.Kword.KWORD;
 
@@ -49,22 +49,50 @@ public class KwordDao extends JooqDao<KwordRecord, Keword, Integer> {
     }
 
 
-    public  List<Keword> get12(Integer num) {
+    public List<Keword> get12(Integer num) {
         Result<KwordRecord> fetch = create().selectFrom(KWORD).limit(num).fetch();
         return null != fetch ? fetch.into(Keword.class) : new ArrayList<>();
     }
 
-    public String getKewordByCnKw(String keword){
+    public String getKewordByCnKw(String keword) {
         Result<Record1<String>> fetch = create().select(KWORD.SCH_KW).from(KWORD).where(KWORD.CN_KW.eq(keword)).fetch();
-        if(null!=fetch){
+        if (null != fetch) {
             List<Keword> into = fetch.into(Keword.class);
-            if(into.size()>0){
+            if (into.size() > 0) {
                 String schKw = into.get(0).getSchKw();
                 return schKw;
-            }else {
+            } else {
                 return null;
             }
         }
         return null;
+    }
+
+//    public void getKewordByCnKwLike(String s) {
+//        boolean containChinese = isContainChinese("1212sdfsd中国人");
+//        System.out.println(containChinese);
+//        if(containChinese){
+//
+//        }
+//        return keyword;
+//    }
+
+
+    public static boolean isContainChinese(String str) {
+        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+        Matcher m = p.matcher(str);
+        if (m.find()) {
+            return true;
+        }
+        return false;
+    }
+
+    public List<Keword> getDateAll() {
+        Result<Record2<String, String>> fetch = create().select(KWORD.CN_KW, KWORD.SCH_KW).from(KWORD).fetch();
+        if (null != fetch) {
+            return fetch.into(Keword.class);
+        } else {
+            return new ArrayList<>();
+        }
     }
 }

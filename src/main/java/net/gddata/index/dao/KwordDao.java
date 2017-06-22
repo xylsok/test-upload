@@ -88,7 +88,7 @@ public class KwordDao extends JooqDao<KwordRecord, Keword, Integer> {
     }
 
     public List<Keword> getDateAll() {
-        Result<Record2<String, String>> fetch = create().select(KWORD.CN_KW, KWORD.SCH_KW).from(KWORD).fetch();
+        Result<Record2<String, String>> fetch = create().select(KWORD.CN_KW, KWORD.EN_KW).from(KWORD).fetch();
         if (null != fetch) {
             return fetch.into(Keword.class);
         } else {

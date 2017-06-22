@@ -902,6 +902,7 @@ public class SearchService {
             }
         });
 
+        List<Keword> list1 = new ArrayList<>();
         for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
             Keword next = it.next();
             if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
@@ -916,12 +917,13 @@ public class SearchService {
                 }
             }
         }
+        list1=dateAll;
         for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
             Keword next = it.next();
             if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
                 String s = set.stream().filter(y -> y.equals(next.getCnKw())).findFirst().orElse(null);
-                Boolean like = master201601Dao.getLike(next.getCnKw());
-                if (like) {
+                List<Master201601> like = master201601Dao.getLike(next.getCnKw());
+                if (null != like) {
                     CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
                     cnkwToEnKw.setCnKw(next.getCnKw());
                     cnkwToEnKw.setEnKw(next.getEnKw());

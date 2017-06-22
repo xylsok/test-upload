@@ -42,12 +42,13 @@ public class Master201601Dao extends JooqDao<Master_201601Record, Master201601, 
         return null != fetch ? fetch.into(String.class) : new ArrayList<>();
     }
 
-    public Boolean getLike(String cnKw) {
+    public List<Master201601> getLike(String cnKw) {
         Result<Master_201601Record> fetch = create().selectFrom(MASTER_201601).where(MASTER_201601.KEYWORDS.like("%" + cnKw + "%")).fetch();
-        if (fetch.size() > 0) {
-            return true;
+        if (null != fetch) {
+            return fetch.into(Master201601.class);
         } else {
-            return false;
+            return null;
         }
+
     }
 }

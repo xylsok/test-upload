@@ -59,17 +59,6 @@ public class ArticleSearchWeb {
         return searchService.getRetrieve4(num);
     }
 
-    @ApiOperation(value = "多算法测试搜索文章量(重新计算并写表)", notes = "多算法测试搜索文章量(重新计算并写表)")
-    @RequestMapping(value = "/search2", method = RequestMethod.GET)
-    public void retrieve2() {
-        searchService.searchArticls2("keywords2");
-    }
-
-    @ApiOperation(value = "多算法测试搜索文章量(使用keywords 重新计算并写表)", notes = "多算法测试搜索文章量(使用keywords 重新计算并写表)")
-    @RequestMapping(value = "/keywords", method = RequestMethod.GET)
-    public void retrieve5() {
-        searchService.searchArticls2("keywords5");
-    }
 
     @ApiOperation(value = "根据关键词测试各算法得数", notes = "根据关键词测试各算法得数")
     @RequestMapping(value = "/getcountbykeword", method = RequestMethod.GET)
@@ -88,6 +77,19 @@ public class ArticleSearchWeb {
     @RequestMapping(value = "/getcount2", method = RequestMethod.GET)
     private Map getCount2() {
         return searchService.getCount2();
+    }
+
+
+    @ApiOperation(value = "多算法测试搜索文章量(重新计算并写表)", notes = "多算法测试搜索文章量(重新计算并写表)")
+    @RequestMapping(value = "/search2", method = RequestMethod.GET)
+    public void retrieve2() {
+        searchService.searchArticls2("keywords2");
+    }
+
+    @ApiOperation(value = "多算法测试搜索文章量(使用keywords 重新计算并写表)", notes = "多算法测试搜索文章量(使用keywords 重新计算并写表)")
+    @RequestMapping(value = "/keywords", method = RequestMethod.GET)
+    public void retrieve5() {
+        searchService.searchArticls2("keywords5");
     }
 
 }

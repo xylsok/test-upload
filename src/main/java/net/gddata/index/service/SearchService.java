@@ -322,9 +322,9 @@ public class SearchService {
             if (null != keywords && !"".equals(keywords)) {
                 split = keywords.split("；");
             }
-            if (split.length == 1) {
-                System.out.println(master);
-            }
+//            if (split.length == 1) {
+//                System.out.println(master);
+//            }
             KeTeLog keTeLog = new KeTeLog();
             keTeLog.setId(master.getId());
             //循环一个课题里的多个中文词 r 为每一个中文关键词
@@ -359,7 +359,9 @@ public class SearchService {
                         Set<String> description = getSearch3(keyword, parser, searcher, "description");
                         Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
 
-                        if (i == split.length - 1) {
+
+
+                        /*if (i == split.length - 1) {
                             jjTitleList.retainAll(title);
                             jjDescriptionList.retainAll(description);
                             jjSubjectList.retainAll(subject);
@@ -367,7 +369,10 @@ public class SearchService {
                             jjTitleList.add(title);
                             jjSubjectList.add(subject);
                             jjDescriptionList.add(description);
-                        }
+                        }*/
+                        jjTitleList.add(title);
+                        jjSubjectList.add(subject);
+                        jjDescriptionList.add(description);
                         /**
                          * 总： std算并集
                          */
@@ -457,7 +462,7 @@ public class SearchService {
     public int arithmetic1(KeTeLog keTeLog, List<Result> list, Instant now, boolean isFlag) {
         List<String> ketilist = new ArrayList<>();
         Result result1 = list.stream().filter(r -> r.getIds().size() == 0).findFirst().orElse(null);
-        if(null!=result1){
+        if (null != result1) {
             list.add(result1);
         }
         for (int i = 0; i < list.size(); i++) {
@@ -668,7 +673,7 @@ public class SearchService {
             return null;
         }
         List<String> intersection = arrayList.get(0);
-        // 就只有一个非空集合，结果就是他咯
+        // 就只有一个非空集合，结果就是他
         if (arrayList.size() == 1) {
             return intersection;
         }
@@ -822,6 +827,7 @@ public class SearchService {
 
         return map;
     }
+
     public Map getCount2() {
         Map map = new HashMap();
 
@@ -858,6 +864,7 @@ public class SearchService {
     public Integer getItemCount(String t) {
         return viewDao.getItemCount(t);
     }
+
     public Integer getItemCount2(String t) {
         return view5Dao.getItemCount(t);
     }
@@ -869,4 +876,23 @@ public class SearchService {
     public List<View> getRetrieve4(Integer num) {
         return view5Dao.getRetrieve3(num);
     }
+
+
+    /*public void ss(){
+
+        List<Result> list = new ArrayList<>();
+        Set<String> result = new HashSet<>();
+        result.add("1");
+        Result result1 = new Result();
+        result1.setIds(result);
+        list.add(result1);
+
+        Set<String> result2 = new HashSet<>();
+        result2.add("4");
+        result2.add("6");
+        Result result12 = new Result();
+        result12.setIds(result2);
+        list.add(result2);
+
+    }*/
 }

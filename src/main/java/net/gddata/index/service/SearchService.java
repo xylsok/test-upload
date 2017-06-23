@@ -922,10 +922,10 @@ public class SearchService {
                 }
             }
         }
+        System.out.println("dateAll======:"+dateAll.size());
         for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
             Keword next = it.next();
             if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
-//                String s = set.stream().filter(y -> y.equals(next.getCnKw())).findFirst().orElse(null);
                 List<Master201601> like = master201601Dao.getLike(next.getCnKw());
                 if (null != like && like.size() > 0) {
                     for (Master201601 master201601 : like) {

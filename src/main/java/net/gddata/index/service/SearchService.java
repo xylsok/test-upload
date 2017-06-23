@@ -347,7 +347,7 @@ public class SearchService {
                 String r = split[i];
                 if (null != r && !"".equals(r)) {
                     //拿单个中文关键词换多个英文关键词
-                    String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
+                    String kewordByCnKw = cnkwToEnKwDao.getKewordByCnKw(r.trim());
                     if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
                         Set<String> resoultList = new HashSet();
                         //存储
@@ -933,13 +933,16 @@ public class SearchService {
                             String[] cnKw = master201601.getKeywords().split("；");
                             if (null != cnKw && cnKw.length > 0) {
                                 for (String y : cnKw) {
-                                    if (null != y && y.contains(s)) {
-                                        CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
-                                        cnkwToEnKw.setCnKw(y);
-                                        cnkwToEnKw.setEnKw(next.getSchKw());
-                                        cnkwToEnKw.setQm(2);
-                                        cnkwToEnKwDao.save(cnkwToEnKw);
-                                        dateAll.remove(next);
+                                    if (null != y && !"".equals(y) && y.contains(s)) {
+                                        boolean status = cnkwToEnKwDao.checkCNKW(s);
+                                        if (!status) {
+                                            CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
+                                            cnkwToEnKw.setCnKw(y);
+                                            cnkwToEnKw.setEnKw(next.getSchKw());
+                                            cnkwToEnKw.setQm(2);
+                                            cnkwToEnKwDao.save(cnkwToEnKw);
+                                            dateAll.remove(next);
+                                        }
                                     }
                                 }
                             }

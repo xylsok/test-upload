@@ -12,4 +12,5 @@ public class CnkwToEnKw {
     private String enKw;
     private Integer kid;
     private Integer qm;
+    private String oldCnkw;
 }

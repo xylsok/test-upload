@@ -922,10 +922,10 @@ public class SearchService {
                 }
             }
         }
-        System.out.println("dateAll======:"+dateAll.size());
+        System.out.println("dateAll======:" + dateAll.size());
         for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
             Keword next = it.next();
-            if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
+            if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw()) && (next.getCnKw().length() >= 2)) {
                 List<Master201601> like = master201601Dao.getLike(next.getCnKw());
                 if (null != like && like.size() > 0) {
                     for (Master201601 master201601 : like) {
@@ -940,8 +940,8 @@ public class SearchService {
                                             cnkwToEnKw.setCnKw(y);
                                             cnkwToEnKw.setEnKw(next.getSchKw());
                                             cnkwToEnKw.setQm(2);
+                                            cnkwToEnKw.setOldCnkw(next.getCnKw());
                                             cnkwToEnKwDao.save(cnkwToEnKw);
-                                            dateAll.remove(next);
                                         }
                                     }
                                 }
@@ -950,6 +950,8 @@ public class SearchService {
                     }
                 }
             }
+            dateAll.remove(next);
+            System.out.println("dateAll减去后大小:" + dateAll.size());
         }
         for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
             Keword next = it.next();
@@ -965,14 +967,7 @@ public class SearchService {
 
     @Test
     public void qqqq9() {
-        Set<String> set = new HashSet<>();
-        set.add("zhang");
-        set.add("zhen");
-        set.add("zhen2");
-        for (Iterator<String> it = set.iterator(); it.hasNext(); ) {
-            String val = it.next();
-            it.remove();
-            System.out.println(set);
-        }
+        String ss = "SN";
+        System.out.println(ss.length());
     }
 }

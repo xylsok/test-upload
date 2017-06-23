@@ -347,7 +347,7 @@ public class SearchService {
                 String r = split[i];
                 if (null != r && !"".equals(r)) {
                     //拿单个中文关键词换多个英文关键词
-                    String kewordByCnKw = cnkwToEnKwDao.getKewordByCnKw(r.trim());
+                    String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
                     if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
                         Set<String> resoultList = new HashSet();
                         //存储
@@ -739,7 +739,7 @@ public class SearchService {
         if (split.length > 0) {
             List<Result> list = new ArrayList();
             for (String r : split) {
-                String kewordByCnKw = cnkwToEnKwDao.getKewordByCnKw(r.trim());
+                String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
 
 
                 if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {

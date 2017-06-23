@@ -92,6 +92,7 @@ public class ArticleSearchWeb {
         searchService.searchArticls2("keywords5");
     }
 
+    @ApiIgnore
     @ApiOperation(value = "整理数据", notes = "整理数据")
     @RequestMapping(value = "/sortingdata", method = RequestMethod.GET)
     public void sortingData() {

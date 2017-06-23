@@ -925,7 +925,7 @@ public class SearchService {
         for (Iterator<Keword> it = dateAll.iterator(); it.hasNext(); ) {
             Keword next = it.next();
             if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
-                String s = set.stream().filter(y -> y.equals(next.getCnKw())).findFirst().orElse(null);
+//                String s = set.stream().filter(y -> y.equals(next.getCnKw())).findFirst().orElse(null);
                 List<Master201601> like = master201601Dao.getLike(next.getCnKw());
                 if (null != like && like.size() > 0) {
                     for (Master201601 master201601 : like) {
@@ -933,8 +933,8 @@ public class SearchService {
                             String[] cnKw = master201601.getKeywords().split("；");
                             if (null != cnKw && cnKw.length > 0) {
                                 for (String y : cnKw) {
-                                    if (null != y && !"".equals(y) && y.contains(s)) {
-                                        boolean status = cnkwToEnKwDao.checkCNKW(s);
+                                    if (null != y && !"".equals(y) && y.contains(next.getCnKw())) {
+                                        boolean status = cnkwToEnKwDao.checkCNKW(next.getCnKw());
                                         if (!status) {
                                             CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
                                             cnkwToEnKw.setCnKw(y);

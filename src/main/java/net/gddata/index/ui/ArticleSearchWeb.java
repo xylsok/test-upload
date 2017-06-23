@@ -47,14 +47,14 @@ public class ArticleSearchWeb {
         return searchService.getRetrieve2(num);
     }
 
-    @ApiOperation(value = "查询列表", notes = "查询列表")
-    @RequestMapping(value = "/list2", method = RequestMethod.GET)
+    @ApiOperation(value = "查询三个中文关键词搜索的结果列表", notes = "查询三个中文关键词搜索的结果列表")
+    @RequestMapping(value = "/list3", method = RequestMethod.GET)
     public List<View> getRetrieve3(@ApiParam("条数") @RequestParam(value = "num", defaultValue = "20", required = false) Integer num) {
         return searchService.getRetrieve3(num);
     }
 
-    @ApiOperation(value = "查询列表2", notes = "查询列表2(keywordds 5个关键词)")
-    @RequestMapping(value = "/list3", method = RequestMethod.GET)
+    @ApiOperation(value = "查询五个中文关键词搜索的结果列表", notes = "查询五个中文关键词搜索的结果列表")
+    @RequestMapping(value = "/list5", method = RequestMethod.GET)
     public List<View> getRetrieve4(@ApiParam("条数") @RequestParam(value = "num", defaultValue = "20", required = false) Integer num) {
         return searchService.getRetrieve4(num);
     }
@@ -67,27 +67,27 @@ public class ArticleSearchWeb {
         return searchresult;
     }
 
-    @ApiOperation(value = "查看各算法占比1", notes = "查看各算法占比")
-    @RequestMapping(value = "/getcount", method = RequestMethod.GET)
+    @ApiOperation(value = "查看三个中文关键词生成的各算法占比情况", notes = "查看三个中文关键词生成的各算法占比情况")
+    @RequestMapping(value = "/getcount3", method = RequestMethod.GET)
     private Map getCount() {
         return searchService.getCount();
     }
 
-    @ApiOperation(value = "查看各算法占比2", notes = "查看各算法占比使用keywords")
-    @RequestMapping(value = "/getcount2", method = RequestMethod.GET)
+    @ApiOperation(value = "查看五个中文关键词生成的各算法占比情况", notes = "查看五个中文关键词生成的各算法占比情况")
+    @RequestMapping(value = "/getcount5", method = RequestMethod.GET)
     private Map getCount2() {
         return searchService.getCount2();
     }
 
 
-    @ApiOperation(value = "多算法测试搜索文章量(重新计算并写表)", notes = "多算法测试搜索文章量(重新计算并写表)")
-    @RequestMapping(value = "/search2", method = RequestMethod.GET)
+    @ApiOperation(value = "测试三个中文关键词的搜索数量(重新计算并写表)", notes = "测试三个中文关键词的搜索数量(重新计算并写表)")
+    @RequestMapping(value = "/search3", method = RequestMethod.GET)
     public void retrieve2() {
         searchService.searchArticls2("keywords2");
     }
 
-    @ApiOperation(value = "多算法测试搜索文章量(使用keywords 重新计算并写表)", notes = "多算法测试搜索文章量(使用keywords 重新计算并写表)")
-    @RequestMapping(value = "/keywords", method = RequestMethod.GET)
+    @ApiOperation(value = "测试五个中文关键词的搜索数量(使用keywords 重新计算并写表)", notes = "测试五个中文关键词的搜索数量(使用keywords 重新计算并写表)")
+    @RequestMapping(value = "/search5", method = RequestMethod.GET)
     public void retrieve5() {
         searchService.searchArticls2("keywords5");
     }
@@ -98,8 +98,4 @@ public class ArticleSearchWeb {
     public void sortingData() {
         searchService.sortingData();
     }
-
-
-
-
 }

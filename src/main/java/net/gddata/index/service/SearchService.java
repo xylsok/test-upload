@@ -741,7 +741,6 @@ public class SearchService {
             for (String r : split) {
                 String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
 
-
                 if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
                     Set<String> resoultList = new HashSet();
                     //存储
@@ -757,6 +756,30 @@ public class SearchService {
                     /**
                      * 总： std算并集
                      */
+                    title.forEach(titleList::add);
+                    description.forEach(descriptionList::add);
+                    subject.forEach(subjectList::add);
+
+                    jjTitleList.add(title);
+                    jjSubjectList.add(subject);
+                    jjDescriptionList.add(description);
+
+                    //s d t 算并集
+                    resoultList.addAll(title);
+                    resoultList.addAll(description);
+                    resoultList.addAll(subject);
+
+                    result.setIds(resoultList);
+                    list.add(result);
+                }else {
+                    Set<String> resoultList = new HashSet();
+                    //存储
+                    Result result = new Result();
+
+                    Set<String> title = new HashSet<>();
+                    Set<String> description = new HashSet<>();
+                    Set<String> subject = new HashSet<>();
+
                     title.forEach(titleList::add);
                     description.forEach(descriptionList::add);
                     subject.forEach(subjectList::add);

@@ -933,7 +933,7 @@ public class SearchService {
                             String[] cnKw = master201601.getKeywords().split("；");
                             if (null != cnKw && cnKw.length > 0) {
                                 for (String y : cnKw) {
-                                    if (y.contains(s)) {
+                                    if (null != y && y.contains(s)) {
                                         CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
                                         cnkwToEnKw.setCnKw(y);
                                         cnkwToEnKw.setEnKw(next.getSchKw());

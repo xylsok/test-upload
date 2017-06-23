@@ -915,7 +915,7 @@ public class SearchService {
                 if (null != s && !"".equals(s)) {
                     CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
                     cnkwToEnKw.setCnKw(next.getCnKw());
-                    cnkwToEnKw.setEnKw(next.getEnKw());
+                    cnkwToEnKw.setEnKw(next.getSchKw());
                     cnkwToEnKw.setQm(1);
                     cnkwToEnKwDao.save(cnkwToEnKw);
                     dateAll.remove(next);
@@ -930,7 +930,7 @@ public class SearchService {
                 if (null != like) {
                     CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
                     cnkwToEnKw.setCnKw(next.getCnKw());
-                    cnkwToEnKw.setEnKw(next.getEnKw());
+                    cnkwToEnKw.setEnKw(next.getSchKw());
                     cnkwToEnKw.setQm(2);
                     cnkwToEnKwDao.save(cnkwToEnKw);
                     dateAll.remove(next);
@@ -942,7 +942,7 @@ public class SearchService {
             if (null != next && null != next.getCnKw() && !"".equals(next.getCnKw())) {
                 CnkwToEnKw cnkwToEnKw = new CnkwToEnKw();
                 cnkwToEnKw.setCnKw(next.getCnKw());
-                cnkwToEnKw.setEnKw(next.getEnKw());
+                cnkwToEnKw.setEnKw(next.getSchKw());
                 cnkwToEnKw.setQm(3);
                 cnkwToEnKwDao.save(cnkwToEnKw);
             }

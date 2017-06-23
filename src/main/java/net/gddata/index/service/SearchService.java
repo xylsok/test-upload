@@ -388,29 +388,29 @@ public class SearchService {
                 /**
                  *   甲算法
                  */
-                int i = arithmetic1(keTeLog, list, now, false);
-                view.setN1(i);
+                NewResult newResult = arithmetic1(keTeLog, list, now, false);
+                view.setN1(newResult.getSize());
 
                 /**
                  *   已算法
                  */
-                int i1 = arithmetic2(keTeLog, list, now, false);
-                view.setN2(i1);
+                NewResult newResult1 = arithmetic2(keTeLog, list, now, false);
+                view.setN2(newResult1.getSize());
 
                 /**
                  *   丙算法
                  */
-                int i2 = arithmetic3(keTeLog, titleList, now, "丙1-title" + random(), false);
-                int i3 = arithmetic3(keTeLog, descriptionList, now, "丙2-desc" + random(), false);
-                int i4 = arithmetic3(keTeLog, subjectList, now, "丙3-subject" + random(), false);
-                view.setN3(i2);
-                view.setN4(i3);
-                view.setN5(i4);
+                NewResult newResult2 = arithmetic3(keTeLog, titleList, now, "丙1-title" + random(), false);
+                NewResult newResult3 = arithmetic3(keTeLog, descriptionList, now, "丙2-desc" + random(), false);
+                NewResult newResult4 = arithmetic3(keTeLog, subjectList, now, "丙3-subject" + random(), false);
+                view.setN3(newResult2.getSize());
+                view.setN4(newResult3.getSize());
+                view.setN5(newResult4.getSize());
                 /**
                  *  丁算法
                  */
-                int i5 = arithmetic4(keTeLog, jjTitleList, jjSubjectList, jjDescriptionList, now, false);
-                view.setN6(i5);
+                NewResult newResult5 = arithmetic4(keTeLog, jjTitleList, jjSubjectList, jjDescriptionList, now, false);
+                view.setN6(newResult5.getSize());
 
 
             }
@@ -424,13 +424,17 @@ public class SearchService {
                     //仅放前5个
                     List<String> list2 = new ArrayList();
                     sumList.forEach(list2::add);
+//                    NewResult newResult = new NewResult();
                     if (list2.size() > 5) {
                         keTeLog.setGuis(list2.subList(0, 5));
+//                        newResult.setGuis(list2.subList(0, 5));
                     } else {
                         keTeLog.setGuis(list2);
+//                        newResult.setGuis(list2);
                     }
                     keTeLog.setDesc("戊法丁:所有英文词在三个字段中搜索后的值");
                     keTeLog.setSize(sumList.size());
+//                    newResult.setSize(sumList.size());
                     keTeLog.setTime(FormatDateTime.betweenTime(now));
                     indexUtils.ObjectSerialization2(keTeLog, "/data/log/戊" + random() + ".txt");
                     view.setN7(sumList.size());
@@ -450,7 +454,7 @@ public class SearchService {
         return null;
     }
 
-    public int arithmetic1(KeTeLog keTeLog, List<Result> list, Instant now, boolean isFlag) {
+    public NewResult arithmetic1(KeTeLog keTeLog, List<Result> list, Instant now, boolean isFlag) {
         List<String> ketilist = new ArrayList<>();
         Result result1 = list.stream().filter(r -> r.getIds().size() == 0).findFirst().orElse(null);
         if (null != result1) {
@@ -464,11 +468,14 @@ public class SearchService {
                 ketilist.addAll(result.getIds());
             }
         }
+        NewResult newResult = new NewResult();
         //仅放前5个
         if (ketilist.size() > 5) {
             keTeLog.setGuis(ketilist.subList(0, 5));
+            newResult.setGuis(ketilist.subList(0, 5));
         } else {
             keTeLog.setGuis(ketilist);
+            newResult.setGuis(ketilist);
         }
         keTeLog.setDesc("甲算法: 结果交集最相关");
         keTeLog.setSize(ketilist.size());
@@ -476,37 +483,57 @@ public class SearchService {
         if (isFlag) {
             indexUtils.ObjectSerialization2(keTeLog, "/data/log/甲" + random() + ".txt");
         }
-        return ketilist.size();
+        newResult.setSize(ketilist.size());
+        return newResult;
     }
 
-    public int arithmetic2(KeTeLog keTeLog, List<Result> rlist, Instant now, boolean isFlag) {
+    public NewResult arithmetic2(KeTeLog keTeLog, List<Result> rlist, Instant now, boolean isFlag) {
         List<String> list = new ArrayList();
         for (int i = 0; i < rlist.size(); i++) {
             Result result = rlist.get(i);
             list.addAll(result.getIds());
         }
+        NewResult newResult = new NewResult();
+        //仅放前5个
         List l = core(list, keTeLog);
+        if (l.size() > 5) {
+            keTeLog.setGuis(l.subList(0, 5));
+            newResult.setGuis(l.subList(0, 5));
+        } else {
+            keTeLog.setGuis(l);
+            newResult.setGuis(l);
+        }
         keTeLog.setDesc("算法乙: 结果并集重复数据>1 次相关");
         keTeLog.setSize(l.size());
+        newResult.setSize(l.size());
         keTeLog.setTime(FormatDateTime.betweenTime(now));
         if (isFlag) {
             indexUtils.ObjectSerialization2(keTeLog, "/data/log/乙" + random() + ".txt");
         }
-        return l.size();
+        return newResult;
     }
 
-    public int arithmetic3(KeTeLog keTeLog, List<String> list, Instant now, String name, boolean isFlag) {
+    public NewResult arithmetic3(KeTeLog keTeLog, List<String> list, Instant now, String name, boolean isFlag) {
         List l = core(list, keTeLog);
+        NewResult newResult = new NewResult();
+        if (l.size() > 5) {
+            keTeLog.setGuis(l.subList(0, 5));
+            newResult.setGuis(l.subList(0, 5));
+        } else {
+            keTeLog.setGuis(l);
+            newResult.setGuis(l);
+        }
         keTeLog.setDesc("算法丙: 结果并集重复数据>1 次相关");
         keTeLog.setSize(l.size());
+        newResult.setSize(l.size());
         keTeLog.setTime(FormatDateTime.betweenTime(now));
         if (isFlag) {
             indexUtils.ObjectSerialization2(keTeLog, "/data/log/" + name + ".txt");
         }
-        return l.size();
+        return newResult;
     }
 
-    public int arithmetic4(KeTeLog keTeLog, List<Set<String>> listT, List<Set<String>> listS, List<Set<String>> listD, Instant now, boolean isFlag) {
+    public NewResult arithmetic4(KeTeLog keTeLog, List<Set<String>> listT, List<Set<String>> listS, List<Set<String>> listD, Instant now, boolean isFlag) {
         Set<String> listTt = retainElementList(listT);
         Set<String> listSs = retainElementList(listS);
         Set<String> listDd = retainElementList(listD);
@@ -514,19 +541,23 @@ public class SearchService {
         listTt.forEach(lsit::add);
         listSs.forEach(lsit::add);
         listDd.forEach(lsit::add);
+        NewResult newResult = new NewResult();
         //仅放前5个
         if (lsit.size() > 5) {
             keTeLog.setGuis(lsit.subList(0, 5));
+            newResult.setGuis(lsit.subList(0, 5));
         } else {
             keTeLog.setGuis(lsit);
+            newResult.setGuis(lsit);
         }
         keTeLog.setDesc("算法丁: (As^Bs^Cs) V (Ad^Bd^Cd) V (At^Bt^Ct)");
         keTeLog.setSize(lsit.size());
+        newResult.setSize(lsit.size());
         keTeLog.setTime(FormatDateTime.betweenTime(now));
         if (isFlag) {
             indexUtils.ObjectSerialization2(keTeLog, "/data/log/丁" + random() + ".txt");
         }
-        return lsit.size();
+        return newResult;
     }
 
     public List core(List<String> list, KeTeLog keTeLog) {
@@ -545,12 +576,7 @@ public class SearchService {
                 l.add(key);
             }
         }
-        //仅放前5个
-        if (l.size() > 5) {
-            keTeLog.setGuis(l.subList(0, 5));
-        } else {
-            keTeLog.setGuis(l);
-        }
+
         return l;
     }
 
@@ -713,7 +739,7 @@ public class SearchService {
         if (split.length > 0) {
             List<Result> list = new ArrayList();
             for (String r : split) {
-                String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
+                String kewordByCnKw = cnkwToEnKwDao.getKewordByCnKw(r.trim());
                 if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
                     Set<String> resoultList = new HashSet();
                     //存储
@@ -749,40 +775,55 @@ public class SearchService {
                 /**
                  *   甲算法
                  */
-                int i = arithmetic1(keTeLog, list, now, false);
-                searchResult.setN1(i);
+                NewResult newResult = arithmetic1(keTeLog, list, now, false);
+                searchResult.setN1(newResult.getSize());
+                searchResult.setN1Guis(newResult.getGuis());
 
                 /**
                  *   已算法
                  */
-                int i1 = arithmetic2(keTeLog, list, now, false);
-                searchResult.setN2(i1);
+                NewResult newResult1 = arithmetic2(keTeLog, list, now, false);
+                searchResult.setN2(newResult1.getSize());
+                searchResult.setN2Guis(newResult1.getGuis());
 
                 /**
                  *   丙算法
                  */
-                int i2 = arithmetic3(keTeLog, titleList, now, "丙1-title" + random(), false);
-                searchResult.setN3(i2);
-                int i3 = arithmetic3(keTeLog, descriptionList, now, "丙2-desc" + random(), false);
-                searchResult.setN4(i3);
-                int i4 = arithmetic3(keTeLog, subjectList, now, "丙3-subject" + random(), false);
-                searchResult.setN5(i4);
+                NewResult newResult2 = arithmetic3(keTeLog, titleList, now, "丙1-title" + random(), false);
+                searchResult.setN3(newResult2.getSize());
+                searchResult.setN3Guis(newResult2.getGuis());
+                NewResult newResult3 = arithmetic3(keTeLog, descriptionList, now, "丙2-desc" + random(), false);
+                searchResult.setN4(newResult3.getSize());
+                searchResult.setN4Guis(newResult3.getGuis());
+                NewResult newResult4 = arithmetic3(keTeLog, subjectList, now, "丙3-subject" + random(), false);
+                searchResult.setN5(newResult4.getSize());
+                searchResult.setN5Guis(newResult4.getGuis());
                 /**
                  *  丁算法
                  */
-                int i5 = arithmetic4(keTeLog, jjTitleList, jjSubjectList, jjDescriptionList, now, false);
-                searchResult.setN6(i5);
+                NewResult newResult5 = arithmetic4(keTeLog, jjTitleList, jjSubjectList, jjDescriptionList, now, false);
+                searchResult.setN6(newResult5.getSize());
+                searchResult.setN6Guis(newResult5.getGuis());
 
             }
             if (stringBuffer.length() > 0) {
-
                 searchResult.setEnKw(stringBuffer.toString());
                 Set<String> sumList = getSearch3(stringBuffer.toString(), parser, searcher, "complex2");
                 if (sumList.size() > 0) {
                     /**
                      * 戊算法
                      */
-                    searchResult.setN7(sumList.size());
+                    //仅放前5个
+                    List<String> list2 = new ArrayList();
+                    sumList.forEach(list2::add);
+                    if (list2.size() > 5) {
+                        keTeLog.setGuis(list2.subList(0, 5));
+                        searchResult.setN7Guis(list2.subList(0, 5));
+                    } else {
+                        keTeLog.setGuis(list2);
+                        searchResult.setN7Guis(list2);
+                    }
+                    searchResult.setN7(list2.size());
                 }
             }
         }

@@ -2,6 +2,8 @@ package net.gddata.index.model;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Created by zhangzf on 17/6/16.
  */
@@ -17,4 +19,11 @@ public class SearchResult {
     private Integer n6;//丁
     private Integer n7;//戊
     private String time;
+    private List<String> n1Guis;//甲
+    private List<String> n2Guis;//甲
+    private List<String> n3Guis;//甲
+    private List<String> n4Guis;//甲
+    private List<String> n5Guis;//甲
+    private List<String> n6Guis;//甲
+    private List<String> n7Guis;//甲
 }

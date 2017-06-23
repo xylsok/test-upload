@@ -379,7 +379,7 @@ public class SearchService {
 
                         result.setIds(resoultList);
                         list.add(result);
-                    }else {
+                    } else {
                         Set<String> resoultList = new HashSet();
                         //存储
                         Result result = new Result();
@@ -795,7 +795,7 @@ public class SearchService {
 
                     result.setIds(resoultList);
                     list.add(result);
-                }else {
+                } else {
                     Set<String> resoultList = new HashSet();
                     //存储
                     Result result = new Result();
@@ -1062,5 +1062,29 @@ public class SearchService {
     public void qqqq9() {
         String ss = "SN";
         System.out.println(ss.length());
+    }
+
+    public Map sortingData2(String keyword) {
+        Map map = new HashMap();
+        if (null == keyword || "".equals(keyword)) {
+            map.put("masage", "请输入");
+            return map;
+        }
+        SearchResult searchResult = new SearchResult();
+        searchResult.setCnKw(keyword);
+        List<SubIndex> indexes = indexUtils.getIndexs();
+        if (indexes.size() == 0) {
+            System.out.println("没有可用的索引");
+        }
+        IndexSearcher searcher = getSearchers(indexes);
+        Analyzer analyzer = new StandardAnalyzer();
+        String defaultField = "title";
+        QueryParser parser = new QueryParser(defaultField, analyzer);
+        Set<String> title = getSearch3(keyword, parser, searcher, "title");
+        Set<String> description = getSearch3(keyword, parser, searcher, "description");
+        Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
+
+        map.put("guis", "title:" + title + "---desc:" + description + "-----subject:" + subject);
+        return map;
     }
 }

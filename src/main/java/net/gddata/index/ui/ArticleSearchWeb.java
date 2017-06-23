@@ -98,4 +98,10 @@ public class ArticleSearchWeb {
     public void sortingData() {
         searchService.sortingData();
     }
+
+    @ApiOperation(value = "输入英文搜索", notes = "输入英文搜索")
+    @RequestMapping(value = "/searchen", method = RequestMethod.GET)
+    public Map test(@RequestParam("keyword") String keyword){
+        return searchService.sortingData2(keyword);
+    }
 }

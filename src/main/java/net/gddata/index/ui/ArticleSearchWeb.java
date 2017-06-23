@@ -86,7 +86,7 @@ public class ArticleSearchWeb {
         searchService.searchArticls2("keywords2");
     }
 
-    @ApiOperation(value = "测试五个中文关键词的搜索数量(使用keywords 重新计算并写表)", notes = "测试五个中文关键词的搜索数量(使用keywords 重新计算并写表)")
+    @ApiOperation(value = "测试五个中文关键词的搜索数量(重新计算并写表)", notes = "测试五个中文关键词的搜索数量(重新计算并写表)")
     @RequestMapping(value = "/search5", method = RequestMethod.GET)
     public void retrieve5() {
         searchService.searchArticls2("keywords5");

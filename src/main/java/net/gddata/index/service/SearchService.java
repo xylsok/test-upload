@@ -740,6 +740,8 @@ public class SearchService {
             List<Result> list = new ArrayList();
             for (String r : split) {
                 String kewordByCnKw = cnkwToEnKwDao.getKewordByCnKw(r.trim());
+
+
                 if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
                     Set<String> resoultList = new HashSet();
                     //存储
@@ -759,6 +761,9 @@ public class SearchService {
                     description.forEach(descriptionList::add);
                     subject.forEach(subjectList::add);
 
+                    jjTitleList.add(title);
+                    jjSubjectList.add(subject);
+                    jjDescriptionList.add(description);
 
                     //s d t 算并集
                     resoultList.addAll(title);

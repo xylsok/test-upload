@@ -10,5 +10,5 @@ import java.util.Set;
  */
 @Data
 public class Result {
-    private Set<String> ids;
+    private List<String> ids;
 }

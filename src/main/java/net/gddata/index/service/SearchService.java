@@ -150,7 +150,7 @@ public class SearchService {
         return null;
     }
 
-    public Set<String> getSearch3(String keyword, QueryParser parser, IndexSearcher searcher, String fieldName) {
+    public List<String> getSearch3(String keyword, QueryParser parser, IndexSearcher searcher, String fieldName) {
         Query complex = getDissClause(fieldName, keyword.trim(), parser);
         if (null != complex) {
             //search
@@ -158,7 +158,7 @@ public class SearchService {
                 //searching
                 TopDocs docs = searcher.search(complex, Integer.MAX_VALUE);
                 int totalHits = docs.totalHits;
-                Set<String> ids = new HashSet<>();
+                List<String> ids = new ArrayList<>();
                 for (int i = 0; i < docs.scoreDocs.length; i++) {
                     Document doc = searcher.doc(docs.scoreDocs[i].doc);
                     String gui = doc.get("gui");
@@ -346,9 +346,9 @@ public class SearchService {
             List<String> descriptionList = new ArrayList();
             List<String> subjectList = new ArrayList();
 
-            List<Set<String>> jjTitleList = new ArrayList();
-            List<Set<String>> jjDescriptionList = new ArrayList();
-            List<Set<String>> jjSubjectList = new ArrayList();
+            List<List<String>> jjTitleList = new ArrayList();
+            List<List<String>> jjDescriptionList = new ArrayList();
+            List<List<String>> jjSubjectList = new ArrayList();
 
             StringBuffer stringBuffer = new StringBuffer();
             for (int i = 0; i < split.length; i++) {
@@ -357,7 +357,7 @@ public class SearchService {
                     //拿单个中文关键词换多个英文关键词
                     String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
                     if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
-                        Set<String> resoultList = new HashSet();
+                        List<String> resoultList = new ArrayList<>();
                         //存储
                         Result result = new Result();
 
@@ -365,9 +365,9 @@ public class SearchService {
                         now = Instant.now();//查询开始时间
                         String keyword = checkKeyword(kewordByCnKw.trim());
                         stringBuffer.append(keyword + " ");
-                        Set<String> title = getSearch3(keyword, parser, searcher, "title");
-                        Set<String> description = getSearch3(keyword, parser, searcher, "description");
-                        Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
+                        List<String> title = getSearch3(keyword, parser, searcher, "title");
+                        List<String> description = getSearch3(keyword, parser, searcher, "description");
+                        List<String> subject = getSearch3(keyword, parser, searcher, "subject");
 
                         jjTitleList.add(title);
                         jjSubjectList.add(subject);
@@ -388,13 +388,13 @@ public class SearchService {
                         result.setIds(resoultList);
                         list.add(result);
                     } else {
-                        Set<String> resoultList = new HashSet();
+                        List<String> resoultList = new ArrayList<>();
                         //存储
                         Result result = new Result();
 
-                        Set<String> title = new HashSet<>();
-                        Set<String> description = new HashSet<>();
-                        Set<String> subject = new HashSet<>();
+                        List<String> title = new ArrayList<>();
+                        List<String> description = new ArrayList<>();
+                        List<String> subject = new ArrayList<>();
 
                         title.forEach(titleList::add);
                         description.forEach(descriptionList::add);
@@ -448,7 +448,7 @@ public class SearchService {
             }
             if (stringBuffer.length() > 0) {
                 view.setEnKw(stringBuffer.toString());
-                Set<String> sumList = getSearch3(stringBuffer.toString(), parser, searcher, "complex2");
+                List<String> sumList = getSearch3(stringBuffer.toString(), parser, searcher, "complex2");
                 if (sumList.size() > 0) {
                     /**
                      * 戊算法
@@ -500,9 +500,9 @@ public class SearchService {
 //                ketilist.addAll(result.getIds());
 //            }
 //        }
-        List<Set<String>> newList = new ArrayList();
+        List<List<String>> newList = new ArrayList();
         list.stream().forEach(r -> {
-            Set<String> ids = r.getIds();
+            List<String> ids = r.getIds();
             newList.add(ids);
         });
         List<String> ketilist = null;
@@ -511,7 +511,7 @@ public class SearchService {
         if (null != result1) {
             ketilist = new ArrayList<>();
         } else {
-            Set<String> qjj = retainElementList(newList);
+            List<String> qjj = retainElementList(newList);
             ketilist = qjj.parallelStream().collect(Collectors.toList());
         }
 
@@ -579,10 +579,29 @@ public class SearchService {
         return newResult;
     }
 
-    public NewResult arithmetic4(KeTeLog keTeLog, List<Set<String>> listT, List<Set<String>> listS, List<Set<String>> listD, Instant now, boolean isFlag) {
-        Set<String> listTt = retainElementList(listT);
-        Set<String> listSs = retainElementList(listS);
-        Set<String> listDd = retainElementList(listD);
+    public NewResult arithmetic4(KeTeLog keTeLog, List<List<String>> listT, List<List<String>> listS, List<List<String>> listD, Instant now, boolean isFlag) {
+        List<String> strings = listT.stream().filter(r -> r.size() == 0).findFirst().orElse(null);
+        List<String> listTt = null;
+        if (null != strings) {
+            listTt = new ArrayList<>();
+        } else {
+            listTt = retainElementList(listT);
+        }
+        List<String> strings2 = listS.stream().filter(r -> r.size() == 0).findFirst().orElse(null);
+        List<String> listSs = null;
+        if (null != strings2) {
+            listSs = new ArrayList<>();
+        } else {
+            listSs = retainElementList(listS);
+        }
+
+        List<String> strings3 = listD.stream().filter(r -> r.size() == 0).findFirst().orElse(null);
+        List<String> listDd = null;
+        if (null != strings3) {
+            listDd = new ArrayList<>();
+        } else {
+            listDd = retainElementList(listD);
+        }
         List lsit = new ArrayList();
         listTt.forEach(lsit::add);
         listSs.forEach(lsit::add);
@@ -697,7 +716,7 @@ public class SearchService {
         }*/
     }
 
-    @Test
+    /*@Test
     public void run() {
         List<Set<String>> samlist = new ArrayList<>();
         Set<String> list1 = new HashSet<>();
@@ -715,9 +734,9 @@ public class SearchService {
         samlist.add(list1);
         samlist.add(list2);
         samlist.add(list3);
-        Set<String> strings = retainElementList(samlist);
+        List<String> strings = retainElementList(samlist);
         System.out.println(strings);
-    }
+    }*/
 
     public List<String> intersection(List<List<String>> lists) {
         if (lists == null || lists.size() == 0) {
@@ -747,16 +766,23 @@ public class SearchService {
         return intersection;
     }
 
-    public Set<String> retainElementList(List<Set<String>> elementLists) {
+    public List<String> retainElementList(List<List<String>> elementLists) {
         checkNotNull(elementLists, "elementLists should not be null!");
-        Optional<Set<String>> result = elementLists.parallelStream().filter(elementList -> elementList != null && ((Set) elementList).size() != 0).reduce((a, b) -> {
+        Optional<List<String>> result = elementLists.parallelStream().filter(elementList -> elementList != null && ((List) elementList).size() != 0).reduce((a, b) -> {
             a.retainAll(b);
             return a;
         });
-        return result.orElse(new HashSet<>());
+        return result.orElse(new ArrayList<>());
     }
 
+    boolean status2 = false;
+
     public SearchResult search(String keyword) {
+        if (status2) {
+            System.out.println("正在搜索");
+            return null;
+        }
+        status2 = true;
         if (null == keyword || "".equals(keyword)) {
             return new SearchResult();
         }
@@ -776,9 +802,9 @@ public class SearchService {
         List<String> descriptionList = new ArrayList();
         List<String> subjectList = new ArrayList();
 
-        List<Set<String>> jjTitleList = new ArrayList();
-        List<Set<String>> jjDescriptionList = new ArrayList();
-        List<Set<String>> jjSubjectList = new ArrayList();
+        List<List<String>> jjTitleList = new ArrayList();
+        List<List<String>> jjDescriptionList = new ArrayList();
+        List<List<String>> jjSubjectList = new ArrayList();
 
         StringBuffer stringBuffer = new StringBuffer();
         Instant now = Instant.now();
@@ -788,16 +814,16 @@ public class SearchService {
                 String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
 
                 if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
-                    Set<String> resoultList = new HashSet();
+                    List<String> resoultList = new ArrayList<>();
                     //存储
                     Result result = new Result();
 
                     //得到英文词并处理好
                     String key = checkKeyword(kewordByCnKw.trim());
                     stringBuffer.append(key + " ");
-                    Set<String> title = getSearch3(key, parser, searcher, "title");
-                    Set<String> description = getSearch3(key, parser, searcher, "description");
-                    Set<String> subject = getSearch3(key, parser, searcher, "subject");
+                    List<String> title = getSearch3(key, parser, searcher, "title");
+                    List<String> description = getSearch3(key, parser, searcher, "description");
+                    List<String> subject = getSearch3(key, parser, searcher, "subject");
 
                     /**
                      * 总： std算并集
@@ -818,13 +844,13 @@ public class SearchService {
                     result.setIds(resoultList);
                     list.add(result);
                 } else {
-                    Set<String> resoultList = new HashSet();
+                    List<String> resoultList = new ArrayList<>();
                     //存储
                     Result result = new Result();
 
-                    Set<String> title = new HashSet<>();
-                    Set<String> description = new HashSet<>();
-                    Set<String> subject = new HashSet<>();
+                    List<String> title = new ArrayList<>();
+                    List<String> description = new ArrayList<>();
+                    List<String> subject = new ArrayList<>();
 
                     title.forEach(titleList::add);
                     description.forEach(descriptionList::add);
@@ -882,7 +908,7 @@ public class SearchService {
             }
             if (stringBuffer.length() > 0) {
                 searchResult.setEnKw(stringBuffer.toString());
-                Set<String> sumList = getSearch3(stringBuffer.toString(), parser, searcher, "complex2");
+                List<String> sumList = getSearch3(stringBuffer.toString(), parser, searcher, "complex2");
                 if (sumList.size() > 0) {
                     /**
                      * 戊算法
@@ -902,6 +928,7 @@ public class SearchService {
             }
         }
         searchResult.setTime(FormatDateTime.betweenTime(now));
+        status2 = false;
         return searchResult;
     }
 
@@ -984,7 +1011,7 @@ public class SearchService {
     }
 
 
-    @Test
+    /*@Test
     public void ss() {
 
         Set set = new HashSet();
@@ -997,10 +1024,10 @@ public class SearchService {
         list.add(set);
         list.add(set2);
 
-        Set<String> strings = retainElementList(list);
+        List<String> strings = retainElementList(list);
         System.out.println(strings);
     }
-
+*/
     public void sortingData() {
         Set<String> set = new HashSet();
         CopyOnWriteArrayList<Keword> dateAll = new CopyOnWriteArrayList();

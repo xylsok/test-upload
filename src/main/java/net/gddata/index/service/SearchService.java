@@ -157,7 +157,6 @@ public class SearchService {
             try {
                 //searching
                 TopDocs docs = searcher.search(complex, Integer.MAX_VALUE);
-                int totalHits = docs.totalHits;
                 List<String> ids = new ArrayList<>();
                 for (int i = 0; i < docs.scoreDocs.length; i++) {
                     Document doc = searcher.doc(docs.scoreDocs[i].doc);
@@ -316,17 +315,17 @@ public class SearchService {
             list = master201601Dao.getDate5();
         }
         System.out.println("查询到"+list.size());
-        int i = 1;
+        int i = 0;
         for (Master201601 master : list) {
-            forKeywords(master, searcher, parser, keywords);
             i++;
+            forKeywords(master, searcher, parser, keywords);
             System.out.println(i + "--" + master.getId());
-        }
 
+        }
     }
 
     //2 查询英文词
-    public Set<Integer> forKeywords(Master201601 master, IndexSearcher searcher, QueryParser parser, String key) {
+    public void forKeywords(Master201601 master, IndexSearcher searcher, QueryParser parser, String key) {
         if (null != master) {
             View view = new View();
             view.setKid(master.getId());
@@ -369,10 +368,13 @@ public class SearchService {
                         now = Instant.now();//查询开始时间
                         String keyword = checkKeyword(kewordByCnKw.trim());
                         stringBuffer.append(keyword + " ");
+                        System.out.println("搜索开始");
                         List<String> title = getSearch3(keyword, parser, searcher, "title");
                         List<String> description = getSearch3(keyword, parser, searcher, "description");
                         List<String> subject = getSearch3(keyword, parser, searcher, "subject");
-
+                        System.out.println("搜索结束");
+                        System.out.println("||||||||||||||||||||||||||||");
+                        System.out.println("");
                         jjTitleList.add(title);
                         jjSubjectList.add(subject);
                         jjDescriptionList.add(description);
@@ -484,10 +486,7 @@ public class SearchService {
             } else if (key.equals("keywords5")) {
                 view5Dao.save(view);
             }
-
-            return null;
         }
-        return null;
     }
 
     public NewResult arithmetic1(KeTeLog keTeLog, List<Result> list, Instant now, boolean isFlag) {

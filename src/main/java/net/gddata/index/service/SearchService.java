@@ -293,11 +293,11 @@ public class SearchService {
 
     //1 开始
     public void searchArticls2(String keywords) {
-        if (search2) {
-            System.out.println("有一个任务正工作");
-            return;
-        }
-        search2 = true;
+//        if (search2) {
+//            System.out.println("有一个任务正工作");
+//            return;
+//        }
+//        search2 = true;
 
         List<SubIndex> indexes = indexUtils.getIndexs();
         if (indexes.size() == 0) {
@@ -315,8 +315,12 @@ public class SearchService {
         } else {
             list = master201601Dao.getDate5();
         }
+        System.out.println("查询到"+list.size());
+        int i = 1;
         for (Master201601 master : list) {
             forKeywords(master, searcher, parser, keywords);
+            i++;
+            System.out.println(i + "--" + master.getId());
         }
 
     }

@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Created by zhangzf on 16/12/10.
  */
-@Api(value = "索引搜索相关接口", description = "索引搜索相关接口")
+@Api(value = "课题测试文献量", description = "课题测试文献量")
 @RestController
 @RequestMapping(value = "/articleindexsearch")
 public class ArticleSearchWeb {

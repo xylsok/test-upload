@@ -1132,13 +1132,15 @@ public class SearchService {
         Analyzer analyzer = new StandardAnalyzer();
         String defaultField = "title";
         QueryParser parser = new QueryParser(defaultField, analyzer);
-//        Set<String> title = getSearch3(keyword, parser, searcher, "title");
-//        Set<String> description = getSearch3(keyword, parser, searcher, "description");
-//        Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
-//        map.put("guis", "title:" + ids + "---desc:" + description + "-----subject:" + subject);
+        List<String> title = getSearch3(keyword, parser, searcher, "title");
+        List<String> description = getSearch3(keyword, parser, searcher, "description");
+        List<String> subject = getSearch3(keyword, parser, searcher, "subject");
+        map.put("title:" ,title );
+        map.put("desc:",description);
+        map.put("subject:",subject);
 
 
-        try {
+        /*try {
             Query parse = parser.parse("title:(" + keyword + ")");
             TopDocs search = searcher.search(parse, 1000);
             Set<String> ids = new HashSet<>();
@@ -1152,7 +1154,7 @@ public class SearchService {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
         return map;

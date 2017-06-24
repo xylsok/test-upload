@@ -7,6 +7,7 @@ import net.gddata.index.model.Keword;
 import net.gddata.index.model.SearchResult;
 import net.gddata.index.model.View;
 import net.gddata.index.service.SearchService;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -101,7 +102,7 @@ public class ArticleSearchWeb {
 
     @ApiOperation(value = "输入英文搜索", notes = "输入英文搜索")
     @RequestMapping(value = "/searchen", method = RequestMethod.GET)
-    public Map test(@RequestParam("keyword") String keyword){
+    public Map test(@RequestParam("keyword") String keyword) throws ParseException {
         return searchService.sortingData2(keyword);
     }
 }

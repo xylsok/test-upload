@@ -4,13 +4,16 @@ import net.gddata.common.util.FormatDateTime.FormatDateTime;
 import net.gddata.index.dao.*;
 import net.gddata.index.model.*;
 import net.gddata.index.utils.IndexUtils;
+import net.gddata.index.utils.SearchKeywordFilter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.apache.lucene.util.Version;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -197,6 +201,8 @@ public class SearchService {
 
     private Query getDissClause(String fieldName, String keyword, QueryParser parser) {
 //        parser.setDefaultOperator(QueryParser.Operator.OR);
+
+        keyword = SearchKeywordFilter.escape(keyword);
         try {
             Query q = null;
             switch (fieldName) {
@@ -301,6 +307,8 @@ public class SearchService {
         Analyzer analyzer = new StandardAnalyzer();
         String defaultField = "title";
         QueryParser parser = new QueryParser(defaultField, analyzer);
+
+
         List<Master201601> list = null;
         if ("keywords2".equals(keywords)) {
             list = master201601Dao.getDate();
@@ -479,20 +487,27 @@ public class SearchService {
     }
 
     public NewResult arithmetic1(KeTeLog keTeLog, List<Result> list, Instant now, boolean isFlag) {
-        List<String> ketilist = new ArrayList<>();
-        Result result1 = list.stream().filter(r -> r.getIds().size() == 0).findFirst().orElse(null);
-        if (null != result1) {
-            list.add(result1);
-        }
-        for (int i = 0; i < list.size(); i++) {
-            Result result = list.get(i);
-            if (list.size() > 1 && i == list.size() - 1) {
-                ketilist.retainAll(result.getIds());
-            } else {
-                ketilist.addAll(result.getIds());
-            }
-        }
+//        List<String> ketilist = new ArrayList<>();
+//        Result result1 = list.stream().filter(r -> r.getIds().size() == 0).findFirst().orElse(null);
+//        if (null != result1) {
+//            list.add(result1);
+//        }
+//        for (int i = 0; i < list.size(); i++) {
+//            Result result = list.get(i);
+//            if (list.size() > 1 && i == list.size() - 1) {
+//                ketilist.retainAll(result.getIds());
+//            } else {
+//                ketilist.addAll(result.getIds());
+//            }
+//        }
+        List<Set<String>> newList =  new ArrayList();
+        list.stream().forEach(r->{
+            Set<String> ids = r.getIds();
+            newList.add(ids);
+        });
+        Set<String> qjj = retainElementList(newList);
         NewResult newResult = new NewResult();
+        List<String> ketilist = qjj.parallelStream().collect(Collectors.toList());
         //仅放前5个
         if (ketilist.size() > 5) {
             keTeLog.setGuis(ketilist.subList(0, 5));
@@ -1064,7 +1079,7 @@ public class SearchService {
         System.out.println(ss.length());
     }
 
-    public Map sortingData2(String keyword) {
+    public Map sortingData2(String keyword) throws ParseException {
         Map map = new HashMap();
         if (null == keyword || "".equals(keyword)) {
             map.put("masage", "请输入");
@@ -1080,11 +1095,30 @@ public class SearchService {
         Analyzer analyzer = new StandardAnalyzer();
         String defaultField = "title";
         QueryParser parser = new QueryParser(defaultField, analyzer);
-        Set<String> title = getSearch3(keyword, parser, searcher, "title");
-        Set<String> description = getSearch3(keyword, parser, searcher, "description");
-        Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
+//        Set<String> title = getSearch3(keyword, parser, searcher, "title");
+//        Set<String> description = getSearch3(keyword, parser, searcher, "description");
+//        Set<String> subject = getSearch3(keyword, parser, searcher, "subject");
+//        map.put("guis", "title:" + ids + "---desc:" + description + "-----subject:" + subject);
 
-        map.put("guis", "title:" + title + "---desc:" + description + "-----subject:" + subject);
+
+        try {
+            Query parse = parser.parse("title:(" + keyword + ")");
+            TopDocs search = searcher.search(parse, 1000);
+            Set<String> ids = new HashSet<>();
+            for (int i = 0; i < search.scoreDocs.length; i++) {
+                Document doc = searcher.doc(search.scoreDocs[i].doc);
+                String gui = doc.get("gui");
+                ids.add(gui);
+            }
+            map.put("guis", "title:" + ids);
+            return map;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         return map;
     }
+
 }

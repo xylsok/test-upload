@@ -500,14 +500,21 @@ public class SearchService {
 //                ketilist.addAll(result.getIds());
 //            }
 //        }
-        List<Set<String>> newList =  new ArrayList();
-        list.stream().forEach(r->{
+        List<Set<String>> newList = new ArrayList();
+        list.stream().forEach(r -> {
             Set<String> ids = r.getIds();
             newList.add(ids);
         });
-        Set<String> qjj = retainElementList(newList);
+        List<String> ketilist = null;
+        Result result1 = list.stream().filter(r -> r.getIds().size() == 0).findFirst().orElse(null);
         NewResult newResult = new NewResult();
-        List<String> ketilist = qjj.parallelStream().collect(Collectors.toList());
+        if (null != result1) {
+            ketilist = new ArrayList<>();
+        } else {
+            Set<String> qjj = retainElementList(newList);
+            ketilist = qjj.parallelStream().collect(Collectors.toList());
+        }
+
         //仅放前5个
         if (ketilist.size() > 5) {
             keTeLog.setGuis(ketilist.subList(0, 5));

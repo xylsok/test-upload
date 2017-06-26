@@ -28,7 +28,7 @@ public class FastDbWeb {
     Result2Dao result2Dao;
 
     boolean temp = false;
-
+    int i = 0;
     @ApiOperation(value = "写入快建库", notes = "写入快建库")
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public void retrieve() {
@@ -39,8 +39,11 @@ public class FastDbWeb {
         temp = true;
         List<Result2> result2List = result2Dao.getJinque();
         insertInto(result2List, true);
+        System.out.println("精确写入完");
         List<Result2> result2List2 = result2Dao.getJinque2();
+        i=0;
         insertInto(result2List2, false);
+        System.out.println("模糊写入完");
 
 
     }
@@ -49,7 +52,9 @@ public class FastDbWeb {
     FastDbDao fastDbDao;
 
     public void insertInto(List<Result2> result2List, boolean state) {
+
         for (Result2 result2 : result2List) {
+            i++;
             String approvalNo = result2.getApprovalNo();
             String gui = result2.getGui();
             if (null != gui&& !"".equals(gui) && gui.length() > 2) {
@@ -74,7 +79,7 @@ public class FastDbWeb {
                     }
                 }
             }
-            System.out.println("kid: " + result2.getKid());
+            System.out.println("kid: " + result2.getKid()+"i:"+i);
         }
     }
 

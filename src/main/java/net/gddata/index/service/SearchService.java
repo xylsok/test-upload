@@ -1169,6 +1169,8 @@ public class SearchService {
                 if (list1.size() > 2000) {
                     List<String> list2 = list1.subList(0, 2000);
                     result2.setGui(list2.toString());
+                }else {
+                    result2.setGui(list1.toString());
                 }
             }
             result2Dao.save(result2);

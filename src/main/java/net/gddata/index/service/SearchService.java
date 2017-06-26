@@ -315,7 +315,7 @@ public class SearchService {
         } else {
             list = master201601Dao.getDate5();
         }
-        System.out.println("查询到"+list.size());
+        System.out.println("查询到" + list.size());
         int i = 0;
         for (Master201601 master : list) {
             i++;
@@ -994,7 +994,6 @@ public class SearchService {
     }
 
 
-
     public void sortingData() {
         Set<String> set = new HashSet();
         CopyOnWriteArrayList<Keword> dateAll = new CopyOnWriteArrayList();
@@ -1094,9 +1093,9 @@ public class SearchService {
         List<String> title = getSearch3(keyword, parser, searcher, "title");
         List<String> description = getSearch3(keyword, parser, searcher, "description");
         List<String> subject = getSearch3(keyword, parser, searcher, "subject");
-        map.put("title:" ,title );
-        map.put("desc:",description);
-        map.put("subject:",subject);
+        map.put("title:", title);
+        map.put("desc:", description);
+        map.put("subject:", subject);
 
 
         /*try {
@@ -1119,9 +1118,10 @@ public class SearchService {
         return map;
     }
 
-    Boolean searchFlog =false;
+    Boolean searchFlog = false;
+
     public void start() {
-        if(searchFlog){
+        if (searchFlog) {
             return;
         }
         searchFlog = true;
@@ -1137,13 +1137,14 @@ public class SearchService {
 
         List<Master201601> list = master201601Dao.getDate25();
 
-        System.out.println("查询到"+list.size());
+        System.out.println("查询到" + list.size());
         for (Master201601 master : list) {
             jinque(master, searcher, parser);
 
         }
     }
-    public void jinque(Master201601 master, IndexSearcher searcher, QueryParser parser){
+
+    public void jinque(Master201601 master, IndexSearcher searcher, QueryParser parser) {
         if (null != master) {
             String keywords2 = master.getKeywords2();
             String[] strings = checkItem(keywords2);
@@ -1156,12 +1157,12 @@ public class SearchService {
             Result2 result2 = new Result2();
             result2.setQm(1);
             result2.setKid(master.getId());
-            if(search3.size()<=0||search5.size()<=0){
+            if (search3.size() <= 0 || search5.size() <= 0) {
                 result2.setSize(0);
 
                 System.out.println("一个为空交集即为空");
-            }else {
-                List<List<String>> list  = new ArrayList<>();
+            } else {
+                List<List<String>> list = new ArrayList<>();
                 list.add(search3);
                 list.add(search5);
                 List<String> list1 = retainElementList(list);
@@ -1169,7 +1170,7 @@ public class SearchService {
                 if (list1.size() > 2000) {
                     List<String> list2 = list1.subList(0, 2000);
                     result2.setGui(list2.toString());
-                }else {
+                } else {
                     result2.setGui(list1.toString());
                 }
             }
@@ -1177,7 +1178,7 @@ public class SearchService {
         }
     }
 
-    public List<String> search(String[] strings,IndexSearcher searcher, QueryParser parser){
+    public List<String> search(String[] strings, IndexSearcher searcher, QueryParser parser) {
         List<String> sumList = new ArrayList();
         for (int i = 0; i < strings.length; i++) {
             String r = strings[i];
@@ -1192,8 +1193,10 @@ public class SearchService {
                     String keyword = checkKeyword(kewordByCnKw.trim());
                     List<String> title = getSearch3(keyword, parser, searcher, "title");
                     List<String> subject = getSearch3(keyword, parser, searcher, "subject");
+                    List<String> description = getSearch3(keyword, parser, searcher, "description");
                     title.forEach(sumList::add);
                     subject.forEach(sumList::add);
+                    description.forEach(sumList::add);
                 } else {
                     //存储
                     List<String> title = new ArrayList<>();
@@ -1206,7 +1209,26 @@ public class SearchService {
         return core(sumList, new KeTeLog());
     }
 
-    public String[] checkItem(String keywords){
+    public List<String> search2(String[] strings, IndexSearcher searcher, QueryParser parser) {
+        List<String> sumList = new ArrayList();
+        for (int i = 0; i < strings.length; i++) {
+            String r = strings[i];
+            if (null != r && !"".equals(r)) {
+                //拿单个中文关键词换多个英文关键词
+                String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
+                if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
+                    //存储
+                    //得到英文词并处理好
+                    String keyword = checkKeyword(kewordByCnKw.trim());
+                    List<String> description = getSearch3(keyword, parser, searcher, "description");
+                    description.forEach(sumList::add);
+                }
+            }
+        }
+        return core(sumList, new KeTeLog());
+    }
+
+    public String[] checkItem(String keywords) {
         String[] split = {};
         if (null != keywords && !"".equals(keywords)) {
             split = keywords.split("；");
@@ -1214,7 +1236,225 @@ public class SearchService {
         return split;
     }
 
-    public void start2() {
+    boolean searchFlog2 = false;
 
+    public void start2() {
+        if (searchFlog2) {
+            return;
+        }
+        searchFlog2 = true;
+        List<SubIndex> indexes = indexUtils.getIndexs();
+        if (indexes.size() == 0) {
+            System.out.println("没有可用的索引");
+        }
+        IndexSearcher searcher = getSearchers(indexes);
+        Analyzer analyzer = new StandardAnalyzer();
+        String defaultField = "title";
+        QueryParser parser = new QueryParser(defaultField, analyzer);
+        List<Master201601> list = master201601Dao.getDate25();
+        int i = 1;
+        for (Master201601 master : list) {
+            like(master, searcher, parser);
+            System.out.println("ID"+master.getId()+"=="+i++);
+        }
+    }
+
+    private void like(Master201601 master, IndexSearcher searcher, QueryParser parser) {
+        if (null != master) {
+            String keywords2 = master.getKeywords2();
+            String[] strings = checkItem(keywords2);
+
+            String keywords5 = master.getKeywords();
+            String[] strings5 = checkItem(keywords5);
+
+            //丙5 1v2v3
+            List<String> search5 = search(strings5, searcher, parser);
+            //乙5
+            List<String> search6 = searchYi(strings5, searcher, parser);
+
+            //甲3
+            List<String> search7 = searchJia3(strings, searcher, parser);
+
+            //丁3
+            List<String> search8 = searchJia4(strings, searcher, parser);
+
+            //丙3 desc
+            List<String> search9 = search2(strings, searcher, parser);
+            //乙3
+            List<String> search10 = searchYi(strings, searcher, parser);
+            List<String> lsitSum = new ArrayList();
+            lsitSum.addAll(search5);
+            lsitSum.addAll(search6);
+            lsitSum.addAll(search7);
+            lsitSum.addAll(search8);
+            lsitSum.addAll(search9);
+            lsitSum.addAll(search10);
+
+            Result2 result2 = new Result2();
+            result2.setQm(2);
+            result2.setKid(master.getId());
+
+            if (lsitSum.size() > 2000) {
+                List<String> list2 = lsitSum.subList(0, 2000);
+                result2.setGui(list2.toString());
+            } else {
+                result2.setGui(lsitSum.toString());
+            }
+            result2Dao.save(result2);
+        }
+
+    }
+
+
+    private List<String> searchJia4(String[] strings, IndexSearcher searcher, QueryParser parser) {
+
+        List<List<String>> jjTitleList = new ArrayList();
+        List<List<String>> jjDescriptionList = new ArrayList();
+        List<List<String>> jjSubjectList = new ArrayList();
+
+        for (int i = 0; i < strings.length; i++) {
+            String r = strings[i];
+            if (null != r && !"".equals(r)) {
+                //拿单个中文关键词换多个英文关键词
+                String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
+                if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
+                    //存储
+                    String keyword = checkKeyword(kewordByCnKw.trim());
+                    List<String> title = getSearch3(keyword, parser, searcher, "title");
+                    List<String> description = getSearch3(keyword, parser, searcher, "description");
+                    List<String> subject = getSearch3(keyword, parser, searcher, "subject");
+
+                    jjTitleList.add(title);
+                    jjSubjectList.add(subject);
+                    jjDescriptionList.add(description);
+
+                } else {
+                    List<String> title = new ArrayList<>();
+                    List<String> description = new ArrayList<>();
+                    List<String> subject = new ArrayList<>();
+                    jjTitleList.add(title);
+                    jjSubjectList.add(subject);
+                    jjDescriptionList.add(description);
+                }
+            }
+        }
+        List<String> strings1 = jjTitleList.stream().filter(r -> r.size() == 0).findFirst().orElse(null);
+        List<String> listTt = null;
+        if (null != strings1) {
+            listTt = new ArrayList<>();
+        } else {
+            listTt = retainElementList(jjTitleList);
+        }
+        List<String> strings2 = jjSubjectList.stream().filter(r -> r.size() == 0).findFirst().orElse(null);
+        List<String> listSs = null;
+        if (null != strings2) {
+            listSs = new ArrayList<>();
+        } else {
+            listSs = retainElementList(jjSubjectList);
+        }
+
+        List<String> strings3 = jjDescriptionList.stream().filter(r -> r.size() == 0).findFirst().orElse(null);
+        List<String> listDd = null;
+        if (null != strings3) {
+            listDd = new ArrayList<>();
+        } else {
+            listDd = retainElementList(jjDescriptionList);
+        }
+        List<String> lsit = new ArrayList();
+        listTt.forEach(lsit::add);
+        listSs.forEach(lsit::add);
+        listDd.forEach(lsit::add);
+        return lsit;
+    }
+
+    private List<String> searchJia3(String[] strings, IndexSearcher searcher, QueryParser parser) {
+        //循环一个课题里的多个中文词 r 为每一个中文关键词
+        List<Result> list = new ArrayList();
+        for (int i = 0; i < strings.length; i++) {
+            String r = strings[i];
+            if (null != r && !"".equals(r)) {
+                //拿单个中文关键词换多个英文关键词
+                String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
+                if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
+                    List<String> resoultList = new ArrayList<>();
+                    //存储
+                    Result result = new Result();
+
+                    //得到英文词并处理好
+                    String keyword = checkKeyword(kewordByCnKw.trim());
+                    List<String> title = getSearch3(keyword, parser, searcher, "title");
+                    List<String> description = getSearch3(keyword, parser, searcher, "description");
+                    List<String> subject = getSearch3(keyword, parser, searcher, "subject");
+
+                    resoultList.addAll(title);
+                    resoultList.addAll(description);
+                    resoultList.addAll(subject);
+
+                    result.setIds(resoultList);
+                    list.add(result);
+
+                } else {
+                    List<String> resoultList = new ArrayList<>();
+                    //存储
+                    Result result = new Result();
+
+                    List<String> title = new ArrayList<>();
+                    List<String> description = new ArrayList<>();
+                    List<String> subject = new ArrayList<>();
+
+                    resoultList.addAll(title);
+                    resoultList.addAll(description);
+                    resoultList.addAll(subject);
+
+                    result.setIds(resoultList);
+                    list.add(result);
+                }
+            }
+        }
+        List<List<String>> newList = new ArrayList();
+        list.stream().forEach(r -> {
+            List<String> ids = r.getIds();
+            newList.add(ids);
+        });
+        List<String> ketilist = new ArrayList<>();
+        Result result1 = list.stream().filter(r -> r.getIds().size() == 0).findFirst().orElse(null);
+        if (null != result1) {
+            ketilist = new ArrayList<>();
+        } else {
+            ketilist = retainElementList(newList);
+        }
+        return ketilist;
+    }
+
+    private List<String> searchYi(String[] strings5, IndexSearcher searcher, QueryParser parser) {
+        //循环一个课题里的多个中文词 r 为每一个中文关键词
+        List<String> list = new ArrayList();
+        for (int i = 0; i < strings5.length; i++) {
+            String r = strings5[i];
+            if (null != r && !"".equals(r)) {
+                //拿单个中文关键词换多个英文关键词
+                String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
+                if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
+                    String keyword = checkKeyword(kewordByCnKw.trim());
+                    List<String> title = getSearch3(keyword, parser, searcher, "title");
+                    List<String> description = getSearch3(keyword, parser, searcher, "description");
+                    List<String> subject = getSearch3(keyword, parser, searcher, "subject");
+                    title.forEach(list::add);
+                    description.forEach(list::add);
+                    subject.forEach(list::add);
+                }
+            }
+        }
+        return core(list, new KeTeLog());
+    }
+
+    public Map info(String z) {
+        Map map = new HashMap();
+        Integer count = result2Dao.count(z);
+        Integer item = result2Dao.getItem(z);
+        String s = get(count, item);
+        map.put("统计数量:", count);
+        map.put("结果百分比:", s);
+        return map;
     }
 }

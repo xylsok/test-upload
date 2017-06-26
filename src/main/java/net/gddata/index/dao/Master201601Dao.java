@@ -4,6 +4,7 @@ import net.gddata.index.model.Master201601;
 import net.gddata.kw.tables.records.Master_201601Record;
 import org.jooq.Record1;
 import org.jooq.Record2;
+import org.jooq.Record3;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
@@ -50,5 +51,10 @@ public class Master201601Dao extends JooqDao<Master_201601Record, Master201601, 
             return null;
         }
 
+    }
+
+    public List<Master201601> getDate25() {
+        Result<Record3<Integer, String, String>> fetch = create().select(MASTER_201601.ID, MASTER_201601.KEYWORDS, MASTER_201601.KEYWORDS2).from(MASTER_201601).where(MASTER_201601.REPLY_ON_ORGAN.like("%福州大学%")).fetch();
+        return null != fetch ? fetch.into(Master201601.class) : new ArrayList<>();
     }
 }

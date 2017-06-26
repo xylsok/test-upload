@@ -13,7 +13,6 @@ import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
-import org.apache.lucene.util.Version;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,6 +47,9 @@ public class SearchService {
 
     @Autowired
     Master201601Dao master201601Dao;
+
+    @Autowired
+    Result2Dao result2Dao;
 
     private boolean createIndexState = false;
 
@@ -719,27 +720,6 @@ public class SearchService {
         }*/
     }
 
-    /*@Test
-    public void run() {
-        List<Set<String>> samlist = new ArrayList<>();
-        Set<String> list1 = new HashSet<>();
-        list1.add("1");
-        list1.add("2");
-        list1.add("3");
-        Set<String> list2 = new HashSet<>();
-        list2.add("2");
-        list2.add("3");
-        list2.add("4");
-        Set<String> list3 = new HashSet<>();
-        list3.add("3");
-        list3.add("4");
-        list3.add("5");
-        samlist.add(list1);
-        samlist.add(list2);
-        samlist.add(list3);
-        List<String> strings = retainElementList(samlist);
-        System.out.println(strings);
-    }*/
 
     public List<String> intersection(List<List<String>> lists) {
         if (lists == null || lists.size() == 0) {
@@ -1014,23 +994,7 @@ public class SearchService {
     }
 
 
-    /*@Test
-    public void ss() {
 
-        Set set = new HashSet();
-        Set set2 = new HashSet();
-        set.add("z");
-        set.add("f");
-        set2.add("f");
-        set2.add("l");
-        List<Set<String>> list = new ArrayList();
-        list.add(set);
-        list.add(set2);
-
-        List<String> strings = retainElementList(list);
-        System.out.println(strings);
-    }
-*/
     public void sortingData() {
         Set<String> set = new HashSet();
         CopyOnWriteArrayList<Keword> dateAll = new CopyOnWriteArrayList();
@@ -1110,11 +1074,6 @@ public class SearchService {
         }
     }
 
-    @Test
-    public void qqqq9() {
-        String ss = "SN";
-        System.out.println(ss.length());
-    }
 
     public Map sortingData2(String keyword) throws ParseException {
         Map map = new HashMap();
@@ -1158,6 +1117,99 @@ public class SearchService {
 
 
         return map;
+    }
+
+    Boolean searchFlog =false;
+    public void start() {
+        if(searchFlog){
+            return;
+        }
+        searchFlog = true;
+        List<SubIndex> indexes = indexUtils.getIndexs();
+        if (indexes.size() == 0) {
+            System.out.println("没有可用的索引");
+        }
+        IndexSearcher searcher = getSearchers(indexes);
+        Analyzer analyzer = new StandardAnalyzer();
+        String defaultField = "title";
+        QueryParser parser = new QueryParser(defaultField, analyzer);
+
+
+        List<Master201601> list = master201601Dao.getDate25();
+
+        System.out.println("查询到"+list.size());
+        for (Master201601 master : list) {
+            jinque(master, searcher, parser);
+
+        }
+    }
+    public void jinque(Master201601 master, IndexSearcher searcher, QueryParser parser){
+        if (null != master) {
+            String keywords2 = master.getKeywords2();
+            String[] strings = checkItem(keywords2);
+
+            String keywords5 = master.getKeywords();
+            String[] strings5 = checkItem(keywords5);
+
+            List<String> search3 = search(strings, searcher, parser);
+            List<String> search5 = search(strings5, searcher, parser);
+            Result2 result2 = new Result2();
+            result2.setQm(1);
+            result2.setKid(master.getId());
+            if(search3.size()<=0||search5.size()<=0){
+                result2.setSize(0);
+
+                System.out.println("一个为空交集即为空");
+            }else {
+                List<List<String>> list  = new ArrayList<>();
+                list.add(search3);
+                list.add(search5);
+                List<String> list1 = retainElementList(list);
+                result2.setSize(list1.size());
+                if (list1.size() > 2000) {
+                    List<String> list2 = list1.subList(0, 2000);
+                    result2.setGui(list2.toString());
+                }
+            }
+            result2Dao.save(result2);
+        }
+    }
+
+    public List<String> search(String[] strings,IndexSearcher searcher, QueryParser parser){
+        List<String> sumList = new ArrayList();
+        for (int i = 0; i < strings.length; i++) {
+            String r = strings[i];
+            if (null != r && !"".equals(r)) {
+                //拿单个中文关键词换多个英文关键词
+                String kewordByCnKw = kwordDao.getKewordByCnKw(r.trim());
+                if (null != kewordByCnKw && !"".equals(kewordByCnKw)) {
+                    List<String> resoultList = new ArrayList<>();
+                    //存储
+                    Result result = new Result();
+                    //得到英文词并处理好
+                    String keyword = checkKeyword(kewordByCnKw.trim());
+                    List<String> title = getSearch3(keyword, parser, searcher, "title");
+                    List<String> subject = getSearch3(keyword, parser, searcher, "subject");
+                    title.forEach(sumList::add);
+                    subject.forEach(sumList::add);
+                } else {
+                    //存储
+                    List<String> title = new ArrayList<>();
+                    List<String> subject = new ArrayList<>();
+                    title.forEach(sumList::add);
+                    subject.forEach(sumList::add);
+                }
+            }
+        }
+        return core(sumList, new KeTeLog());
+    }
+
+    public String[] checkItem(String keywords){
+        String[] split = {};
+        if (null != keywords && !"".equals(keywords)) {
+            split = keywords.split("；");
+        }
+        return split;
     }
 
 }

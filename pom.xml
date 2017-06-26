@@ -139,7 +139,7 @@
                         <database>
                             <name>org.jooq.util.mysql.MySQLDatabase</name>
                             <inputSchema>${jdbc.db}</inputSchema>
-                            <includes>kword|master_201601|view|view5|cnkwtoenkw</includes>
+                            <includes>kword|master_201601|view|view5|cnkwtoenkw|result</includes>
                             <excludes/>
                         </database>
                         <target>
@@ -186,8 +186,8 @@
                 <java.version>1.8</java.version>
                 <mysql.version>5.1.37</mysql.version>
                 <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                <!--<jdbc.host>192.168.1.140</jdbc.host>-->
-                <jdbc.host>122.70.148.68</jdbc.host>
+                <jdbc.host>192.168.1.140</jdbc.host>
+                <!--<jdbc.host>122.70.148.68</jdbc.host>-->
                 <jdbc.port>3306</jdbc.port>
                 <jdbc.url>jdbc:mysql://${jdbc.host}:${jdbc.port}</jdbc.url>
                 <jdbc.username>root</jdbc.username>

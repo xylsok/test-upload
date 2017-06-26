@@ -24,4 +24,10 @@ public class ArticleSearch2Web {
     public void start() {
         searchService.start();
     }
+
+    @ApiOperation(value = "计算次相关", notes = "计算最相关与次相关")
+    @RequestMapping(value = "/start", method = RequestMethod.GET)
+    public void start2() {
+        searchService.start2();
+    }
 }

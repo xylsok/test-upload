@@ -21,25 +21,25 @@ public class ArticleSearch2Web {
     @Autowired
     SearchService searchService;
 
-    @ApiOperation(value = "计算最相关", notes = "计算最相关")
+    @ApiOperation(value = "查看最相关", notes = "计算最相关")
     @RequestMapping(value = "/start", method = RequestMethod.GET)
     public void start() {
         searchService.start();
     }
 
-    @ApiOperation(value = "计算次相关", notes = "计算次相关")
+    @ApiOperation(value = "查看次相关", notes = "计算次相关")
     @RequestMapping(value = "/start2", method = RequestMethod.GET)
     public void start2() {
         searchService.start2();
     }
 
-    @ApiOperation(value = "计算最相关占比", notes = "计算最相关占比")
+    @ApiOperation(value = "计算最相关占比(会写表慎重点击)", notes = "(会写表慎重点击)")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public Map info() {
         return searchService.info("z");
     }
 
-    @ApiOperation(value = "计算最次关占比", notes = "计算最次关占比")
+    @ApiOperation(value = "计算最次关占比(会写表慎重点击)", notes = "计算最次关占比(会写表慎重点击)")
     @RequestMapping(value = "/info2", method = RequestMethod.GET)
     public Map info2() {
         return searchService.info("c");

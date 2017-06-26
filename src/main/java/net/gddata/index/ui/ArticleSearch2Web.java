@@ -39,7 +39,7 @@ public class ArticleSearch2Web {
         return searchService.info("z");
     }
 
-    @ApiOperation(value = "查看次关占比", notes = "查看次关占比")
+    @ApiOperation(value = "查看次关占比", notes = "查看次相关占比")
     @RequestMapping(value = "/info2", method = RequestMethod.GET)
     public Map info2() {
         return searchService.info("c");

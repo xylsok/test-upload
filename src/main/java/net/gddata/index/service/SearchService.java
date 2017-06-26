@@ -1293,7 +1293,7 @@ public class SearchService {
             Result2 result2 = new Result2();
             result2.setQm(2);
             result2.setKid(master.getId());
-
+            result2.setSize(lsitSum.size());
             if (lsitSum.size() > 2000) {
                 List<String> list2 = lsitSum.subList(0, 2000);
                 result2.setGui(list2.toString());

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,7 +52,7 @@ public class FastDbWeb {
         for (Result2 result2 : result2List) {
             String approvalNo = result2.getApprovalNo();
             String gui = result2.getGui();
-            if (gui.length() > 2) {
+            if (null != gui&& !"".equals(gui) && gui.length() > 2) {
                 String replace = gui.replace("[", "");
                 String replace1 = replace.replace("]", "");
                 String[] split = replace1.split(",");
@@ -65,6 +66,7 @@ public class FastDbWeb {
                     fastDb.setDb(approvalNo);
                     fastDb.setGui(s);
                     try {
+                        fastDb.setTime(new Date());
                         fastDbDao.save(fastDb);
                     } catch (Exception e) {
                         System.out.println("重复的gui" + s);

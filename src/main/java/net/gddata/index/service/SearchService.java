@@ -1193,10 +1193,10 @@ public class SearchService {
                     String keyword = checkKeyword(kewordByCnKw.trim());
                     List<String> title = getSearch3(keyword, parser, searcher, "title");
                     List<String> subject = getSearch3(keyword, parser, searcher, "subject");
-                    List<String> description = getSearch3(keyword, parser, searcher, "description");
+//                    List<String> description = getSearch3(keyword, parser, searcher, "description");
                     title.forEach(sumList::add);
                     subject.forEach(sumList::add);
-                    description.forEach(sumList::add);
+//                    description.forEach(sumList::add);
                 } else {
                     //存储
                     List<String> title = new ArrayList<>();

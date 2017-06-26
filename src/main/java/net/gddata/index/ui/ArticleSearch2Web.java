@@ -22,14 +22,14 @@ public class ArticleSearch2Web {
     @Autowired
     SearchService searchService;
 
-    @ApiIgnore
+
     @ApiOperation(value = "计算最相关(会写表慎重点击)", notes = "计算次相关(会写表慎重点击)")
     @RequestMapping(value = "/start", method = RequestMethod.GET)
     public void start() {
         searchService.start();
     }
 
-    @ApiIgnore
+
     @ApiOperation(value = "计算次相关(会写表慎重点击)", notes = "计算次相关(会写表慎重点击)")
     @RequestMapping(value = "/start2", method = RequestMethod.GET)
     public void start2() {

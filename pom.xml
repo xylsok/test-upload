@@ -79,17 +79,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <!--<profiles>-->
-        <!--<profile>-->
-            <!--<id>local</id>-->
-            <!--<activation>-->
-                <!--<activeByDefault>true</activeByDefault>-->
-            <!--</activation>-->
-            <!--<properties>-->
-                <!--<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
-                <!--<java.version>1.8</java.version>-->
-            <!--</properties>-->
-        <!--</profile>-->
-    <!--</profiles>-->
 </project>

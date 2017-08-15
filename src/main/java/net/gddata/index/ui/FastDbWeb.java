@@ -1,103 +1,80 @@
 package net.gddata.index.ui;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import net.gddata.index.dao.FastDbDao;
-import net.gddata.index.dao.Result2Dao;
-import net.gddata.index.model.FastDb;
-import net.gddata.index.model.Result;
-import net.gddata.index.model.Result2;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by zhangzf on 17/6/26.
  */
-@Api(value = "写入快建库", description = "写入快建库")
 @RestController
 @RequestMapping(value = "/fastdb")
 public class FastDbWeb {
 
-    @Autowired
-    Result2Dao result2Dao;
 
-    boolean temp = false;
-    int i = 0;
-    @ApiOperation(value = "写入快建库", notes = "写入快建库")
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public void retrieve() {
-        if (temp) {
-            System.out.println("tasking");
-            return;
+    @RequestMapping(value = "testUploadFiles", method = RequestMethod.POST)
+    public Map<String,String> upload(HttpServletRequest request, HttpServletResponse response) {
+        response.setContentType("textml;charset=UTF-8");
+
+        try {
+            request.setCharacterEncoding("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
-        temp = true;
-        List<Result2> result2List = result2Dao.getJinque();
-        insertInto(result2List, true);
-        System.out.println("精确写入完");
-        List<Result2> result2List2 = result2Dao.getJinque2();
-        i=0;
-        insertInto(result2List2, false);
-        System.out.println("模糊写入完");
-
-
-    }
-
-    @Autowired
-    FastDbDao fastDbDao;
-
-    public void insertInto(List<Result2> result2List, boolean state) {
-
-        for (Result2 result2 : result2List) {
-            i++;
-            String approvalNo = result2.getApprovalNo();
-            String gui = result2.getGui();
-            if (null != gui&& !"".equals(gui) && gui.length() > 2) {
-                String replace = gui.replace("[", "");
-                String replace1 = replace.replace("]", "");
-                String[] split = replace1.split(",");
-                for (String s : split) {
-                    FastDb fastDb = new FastDb();
-                    if (state) {
-                        fastDb.setCategory("精确");
-                    } else {
-                        fastDb.setCategory("模糊");
-                    }
-                    fastDb.setDb(approvalNo);
-                    fastDb.setGui(s);
-                    try {
-                        fastDb.setTime(new Date());
-                        fastDbDao.save(fastDb);
-                    } catch (Exception e) {
-                        System.out.println("重复的gui" + s);
-                        e.printStackTrace();
-                    }
-                }
-            }
-            System.out.println("kid: " + result2.getKid()+"i:"+i);
+        Part part = null;// myFileName是文件域的name属性值
+        try {
+            part = request.getPart("myFileName");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ServletException e) {
+            e.printStackTrace();
         }
-    }
+        // 文件类型限制
+//        String[] allowedType = { "image/bmp", "image/gif", "image/jpeg", "image/png" };
+//        boolean allowed = Arrays.asList(allowedType).contains(part.getContentType());
+//        if (!allowed) {
+//            try {
+//                response.getWriter().write("error|不支持的类型");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
-    @Test
-    public void ss() {
-        String gui = "[]";
-        if (gui.length() > 2) {
-            String replace = gui.replace("[", "");
-            String replace1 = replace.replace("]", "");
-            String[] split = replace1.split(",");
-            for (String s : split) {
-//            FastDb fastDb = new FastDb();
-//            fastDb.setCategory("精确");
-//            fastDb.setDb(approvalNo);
-//            fastDb.setGui(s);
-//            fastDbDao.save(fastDb);
+        // 图片大小限制
+        if (part.getSize() > 5 * 1024 * 1024) {
+            try {
+                response.getWriter().write("error|图片大小不能超过5M");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+        // 包含原始文件名的字符串
+        String fi = part.getHeader("content-disposition");
+        // 提取文件拓展名
+        String fileNameExtension = fi.substring(fi.indexOf("."), fi.length() - 1);
+        // 生成实际存储的真实文件名
+        String realName = UUID.randomUUID().toString() + fileNameExtension;
+        // 图片存放的真实路径
+//        String realPath = getServletContext().getRealPath("/files") + "/" + realName;
+        // 将文件写入指定路径下
+        try {
+            part.write("/data/filecenter/"+realName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Map<String,String> map = new HashMap();
+        map.put("url","http://file.xylsok.com/"+realName);
+        return map;
 
     }
 }
